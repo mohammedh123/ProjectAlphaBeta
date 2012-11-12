@@ -33,6 +33,7 @@ namespace CS6613_Final
         SpriteFont turnFont;
         CheckersPiece selectedPiece = null;
         GameState state = GameState.PLAYER_QUERY;
+        MouseState oldMouseState = Mouse.GetState();
         
         private int BoardWidthInPixels
         {
@@ -52,6 +53,22 @@ namespace CS6613_Final
             IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
+        }
+
+        public bool LeftMouseClick()
+        {
+            var kdlsf = Mouse.GetState();
+            return Mouse.GetState().LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Released;
+        }
+
+        public bool LeftMouseDown()
+        {
+            return Mouse.GetState().LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Pressed;
+        }
+
+        public bool LeftMouseReleased()
+        {
+            return Mouse.GetState().LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed;
         }
 
         public bool IsWithinBoard(int x, int y)
@@ -136,52 +153,75 @@ namespace CS6613_Final
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
-                this.Exit();
-
-            //let the player continue doing what hes doing until he makes a move
-            // e.g. clicking a piece and then clicking a new place
-            if (state == GameState.SELECTING_PIECE)
+            if (IsActive)
             {
-                if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                // Allows the game to exit
+                if (Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
+                    this.Exit();
+
+                //let the player continue doing what hes doing until he makes a move
+                // e.g. clicking a piece and then clicking a new place
+                if (state == GameState.SELECTING_PIECE)
                 {
-                    int mx = Mouse.GetState().X, my = Mouse.GetState().Y;
-                    int ix = mx / TILE_SIZE, iy = my / TILE_SIZE;
-
-                    if (IsWithinBoard(mx, my))
+                    if (LeftMouseClick())
                     {
-                        //see if mouse clicked on a piece
-                        var piece = cgame.GetPieceAtPosition(ix, iy);
+                        int mx = Mouse.GetState().X, my = Mouse.GetState().Y;
+                        int ix = mx / TILE_SIZE, iy = my / TILE_SIZE;
 
-                        //see if piece is for the right player
-                        if (piece.Color == cgame.CurrentPlayer.Color)
+                        if (IsWithinBoard(mx, my))
                         {
-                            state = GameState.MOVING_PIECE;
-                            selectedPiece = piece;
+                            //see if mouse clicked on a piece
+                            var piece = cgame.GetPieceAtPosition(ix, iy);
+
+                            //see if piece is for the right player
+                            if (piece != null && piece.Color == cgame.CurrentPlayer.Color)
+                            {
+                                state = GameState.MOVING_PIECE;
+                                selectedPiece = piece;
+                            }
+                            else { } //ignore the player trying to move a piece that is not his
                         }
-                        else { } //ignore the player trying to move a piece that is not his
+                        else { } //ignore a click on the board that isnt on a piece
                     }
-                    else { } //ignore a click on the board that isnt on a piece
                 }
-            }
-            else if (state == GameState.MOVING_PIECE)
-            {
-                if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                else if (state == GameState.MOVING_PIECE)
                 {
                     int mx = Mouse.GetState().X, my = Mouse.GetState().Y;
                     int ix = mx / TILE_SIZE, iy = my / TILE_SIZE;
 
-                    //user potentially clicked a new space for the selectedPiece
-                    if (cgame.IsMovingPossible(selectedPiece.X, selectedPiece.Y, ix, iy, selectedPiece.Forward))
+                    //user dragged it to a new slot
+                    if (ix != selectedPiece.X && iy != selectedPiece.Y && cgame.CurrentBoard.IsValidLocation(ix, iy))
                     {
+                        if (LeftMouseClick() || LeftMouseReleased()) //user clicked a new slot
+                        {
+                            try
+                            {
+                                //user potentially clicked a new space for the selectedPiece
+                                var returnVal = cgame.IsMovePossible(cgame.CurrentBoard, selectedPiece.X, selectedPiece.Y, ix, iy, selectedPiece.Color, selectedPiece.Forward);
 
+                                if (returnVal != AvailableMove.NONE)
+                                {
+                                    cgame.MovePiece(selectedPiece, ix, iy);
+                                }
+                                else
+                                    throw new InvalidMoveException(selectedPiece, ix, iy);
+                            }
+                            catch (InvalidMoveException ex)
+                            {
+                                var result = WinForms.MessageBox.Show(String.Format("Error: Invalid move (cannot move {0} to {1}).",
+                                    cgame.CurrentBoard.GetNameForLocation(ex.MovingPiece.X, ex.MovingPiece.Y),
+                                    cgame.CurrentBoard.GetNameForLocation(ex.AttemptedLocation)), "Error", WinForms.MessageBoxButtons.OK);
+
+                                selectedPiece = null;
+                                state = GameState.SELECTING_PIECE;
+                            }
+                        }
                     }
-                    else
-                        throw new InvalidMoveException(selectedPiece, ix, iy);
                 }
+
+                oldMouseState = Mouse.GetState();
             }
-        
+
             base.Update(gameTime);
         }
 

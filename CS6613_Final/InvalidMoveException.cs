@@ -7,15 +7,14 @@ namespace CS6613_Final
 {
     class InvalidMoveException : Exception
     {
-        CheckersPiece movingPiece;
-        int attemptedNewX, attemptedNewY;
+        public CheckersPiece MovingPiece { get; set; }
+        public Location AttemptedLocation { get; set; }
 
         public InvalidMoveException(CheckersPiece piece, int newX, int newY)
         {
-            movingPiece = piece;
+            MovingPiece = piece;
 
-            attemptedNewX = newX;
-            attemptedNewY = newY;
+            AttemptedLocation = new Location(newX, newY);
         }
     }
 }

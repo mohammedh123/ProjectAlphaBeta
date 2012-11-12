@@ -42,14 +42,24 @@ namespace CS6613_Final
         {
             char row, column;
             row = (char)('1' - 1 + Height - y);
-            column = (char)('A' - 1 + x);
+            column = (char)('A' + x);
 
             return "" + row + column;
+        }
+
+        public string GetNameForLocation(Location loc)
+        {
+            return GetNameForLocation(loc.X, loc.Y);
         }
 
         public bool IsValidLocation(int x, int y)
         {
             return x >= 0 && x < Width && y >= 0 && y < Height;
+        }
+
+        public bool IsValidLocation(Location loc)
+        {
+            return IsValidLocation(loc.X, loc.Y);
         }
     }
 }

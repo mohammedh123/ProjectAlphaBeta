@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CS6613_Final
 {
-    class Location
+    public class Location
     {
         public int X { get; set; }
         public int Y { get; set; }

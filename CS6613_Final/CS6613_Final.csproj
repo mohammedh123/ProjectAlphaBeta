@@ -121,6 +121,7 @@
     <Compile Include="IDisplayDriver.cs" />
     <Compile Include="ILogicDriver.cs" />
     <Compile Include="InvalidMoveException.cs" />
+    <Compile Include="Jump.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="PlayerLogicDriver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
