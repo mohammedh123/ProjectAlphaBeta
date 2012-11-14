@@ -57,6 +57,8 @@ namespace CS6613_Final
             }
         }
 
+        public CheckersPiece CurrentSelectedPiece { get; set; }
+
         bool isBlackTurn = true;
         ILogicDriver playerOne, playerTwo;
         IDisplayDriver displayer;
@@ -357,6 +359,11 @@ namespace CS6613_Final
         public void Draw()
         {
             displayer.Draw(CurrentBoard, InPlayPieces);
+        }
+
+        public void DrawGhostPiece(CheckersPiece piece, Location pixelCoords)
+        {
+            displayer.DrawGhostPiece(CurrentBoard, piece, pixelCoords);
         }
 
         public void Turn()

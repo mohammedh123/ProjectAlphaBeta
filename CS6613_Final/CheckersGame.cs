@@ -32,6 +32,8 @@ namespace CS6613_Final
         SpriteBatch spriteBatch;
         SpriteFont turnFont;
         CheckersPiece selectedPiece = null;
+        Vector2 ghostSelectedPosition;
+        Vector2 initialMouseClick;
         GameState state = GameState.PLAYER_QUERY;
         MouseState oldMouseState = Mouse.GetState();
         
@@ -76,6 +78,12 @@ namespace CS6613_Final
             Rectangle rect = new Rectangle(0, 0, BoardWidthInPixels, BoardHeightInPixels);
 
             return rect.Contains(x, y);
+        }
+
+        public void SetSelectedPiece(CheckersPiece p)
+        {
+            selectedPiece = p;
+            cgame.CurrentSelectedPiece = p;
         }
 
         /// <summary>
@@ -177,7 +185,8 @@ namespace CS6613_Final
                             if (piece != null && piece.Color == cgame.CurrentPlayer.Color)
                             {
                                 state = GameState.MOVING_PIECE;
-                                selectedPiece = piece;
+                                initialMouseClick = new Vector2(mx, my);
+                                SetSelectedPiece(piece);
                             }
                             else { } //ignore the player trying to move a piece that is not his
                         }
@@ -187,6 +196,7 @@ namespace CS6613_Final
                 else if (state == GameState.MOVING_PIECE)
                 {
                     int mx = Mouse.GetState().X, my = Mouse.GetState().Y;
+                    ghostSelectedPosition = new Vector2(mx, my);
                     int ix = mx / TILE_SIZE, iy = my / TILE_SIZE;
 
                     //user dragged it to a new slot
@@ -234,7 +244,12 @@ namespace CS6613_Final
             GraphicsDevice.Clear(Color.DarkGray);
             spriteBatch.Begin();
 
-            cgame.Draw();
+            cgame.Draw();    
+            
+            if(state == GameState.MOVING_PIECE && 
+                    Mouse.GetState().LeftButton == ButtonState.Pressed &&
+                    Mouse.GetState().X == initialMouseClick.X && Mouse.GetState().Y == initialMouseClick.Y)
+                cgame.DrawGhostPiece(selectedPiece, new Location(Mouse.GetState().X, Mouse.GetState().Y));
 
             Utility.DrawStringToFitBox(spriteBatch, 
                 turnFont, 

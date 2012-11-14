@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CS6613_Final
 {
-    class CheckersPiece : IEquatable<CheckersPiece>
+    public class CheckersPiece : IEquatable<CheckersPiece>
     {
         public bool InPlay { get; set; }
         public PieceColor Color { get; private set; }

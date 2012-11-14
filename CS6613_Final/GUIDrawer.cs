@@ -15,6 +15,7 @@ namespace CS6613_Final
         ContentManager contentManager;
 
         const int TILE_SIZE = CheckersGame.TILE_SIZE;
+        readonly Vector2 tileCenter = new Vector2(TILE_SIZE * 0.5f, TILE_SIZE * 0.5f);
 
         public GUIDrawer(SpriteBatch sb, ContentManager content)
         {
@@ -52,6 +53,13 @@ namespace CS6613_Final
 
                 spriteBatch.Draw(pieceTexture, new Rectangle(piece.X * TILE_SIZE, piece.Y * TILE_SIZE, TILE_SIZE, TILE_SIZE), Color.White);
             }
+        }
+
+        public override void DrawGhostPiece(Board board, CheckersPiece ghostPiece, Location pixelCoords)
+        {
+            var pieceTexture = ghostPiece.Color == PieceColor.BLACK ? blackPiece : redPiece;
+
+            spriteBatch.Draw(pieceTexture, new Vector2(pixelCoords.X, pixelCoords.Y), null, Color.White*0.5f, 0.0f, tileCenter, 1.0f, SpriteEffects.None, 0);
         }
     }
 }
