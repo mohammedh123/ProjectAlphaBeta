@@ -247,8 +247,8 @@ namespace CS6613_Final
             cgame.Draw();    
             
             if(state == GameState.MOVING_PIECE && 
-                    Mouse.GetState().LeftButton == ButtonState.Pressed &&
-                    Mouse.GetState().X == initialMouseClick.X && Mouse.GetState().Y == initialMouseClick.Y)
+                    Mouse.GetState().LeftButton == ButtonState.Pressed)
+                    //Mouse.GetState().X == initialMouseClick.X && Mouse.GetState().Y == initialMouseClick.Y)
                 cgame.DrawGhostPiece(selectedPiece, new Location(Mouse.GetState().X, Mouse.GetState().Y));
 
             Utility.DrawStringToFitBox(spriteBatch, 

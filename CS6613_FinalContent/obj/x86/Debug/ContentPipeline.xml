@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
+  <Asset Type="Pipeline:BuildItemCollection">
+    <Item>
+      <Source>blackpiece.png</Source>
+      <Name>blackpiece</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blackpiece.xnb</Output>
+      <Time>2012-11-05T17:05:32.1055617-05:00</Time>
+    </Item>
+    <Item>
+      <Source>blacktile.png</Source>
+      <Name>blacktile</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blacktile.xnb</Output>
+      <Time>2012-11-05T14:45:28.3370885-05:00</Time>
+    </Item>
+    <Item>
+      <Source>redpiece.png</Source>
+      <Name>redpiece</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\redpiece.xnb</Output>
+      <Time>2012-11-05T17:05:26.2645535-05:00</Time>
+    </Item>
+    <Item>
+      <Source>whitetile.png</Source>
+      <Name>whitetile</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>c:\users\mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\whitetile.xnb</Output>
+      <Time>2012-11-05T14:45:42.149108-05:00</Time>
+    </Item>
+    <Item>
+      <Source>turnFont.spritefont</Source>
+      <Name>turnFont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\turnFont.xnb</Output>
+      <Time>2012-11-05T18:17:30.838757-05:00</Time>
+    </Item>
+    <BuildSuccessful>true</BuildSuccessful>
+    <Settings>
+      <TargetPlatform>Windows</TargetPlatform>
+      <TargetProfile>HiDef</TargetProfile>
+      <BuildConfiguration>Debug</BuildConfiguration>
+      <CompressContent>false</CompressContent>
+      <RootDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_FinalContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_FinalContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\</OutputDirectory>
+    </Settings>
+    <Assemblies>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.XImporter.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.VideoImporters.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.TextureImporter.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.FBXImporter.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.EffectImporter.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.AudioImporters.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Windows\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
+        <Value>2012-01-26T16:05:03.3687612-05:00</Value>
+      </Assembly>
+    </Assemblies>
+  </Asset>
+</XnaContent>
