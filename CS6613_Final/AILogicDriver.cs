@@ -9,9 +9,16 @@ namespace CS6613_Final
     {
         //must be implemented by all logic driver's
         // return true if it is done finding its next move
-        public override bool GetNextMove(Board board)
+        public override TurnResult GetNextMove(CheckersBoardGame game)
         {
-            return true;
+        }
+
+        public int AlphaBeta(CheckersBoardGame game, int alpha, int beta)
+        {
+            if (game.IsGameOver())
+                return 1; //TODO: FIX THIS CHECK/RET VAL
+            
+            var possibleMoves = game.GetAllAvailableMoves()
         }
     }
 }

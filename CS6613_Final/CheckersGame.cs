@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -26,16 +27,14 @@ namespace CS6613_Final
     {
         public static Texture2D BlankTexture;
         public const int TILE_SIZE = 64;
+        public GameState CurrentGameState = GameState.WAITING_FOR_AI;
+        public Vector2 GhostSelectedPosition { get; set; }
+        public Location InitialMouseClick { get; set; }
 
         GraphicsDeviceManager graphics;
         CheckersBoardGame cgame;
         SpriteBatch spriteBatch;
         SpriteFont turnFont;
-        CheckersPiece selectedPiece = null;
-        Vector2 ghostSelectedPosition;
-        Vector2 initialMouseClick;
-        GameState state = GameState.PLAYER_QUERY;
-        MouseState oldMouseState = Mouse.GetState();
         
         private int BoardWidthInPixels
         {
@@ -57,22 +56,6 @@ namespace CS6613_Final
             Content.RootDirectory = "Content";
         }
 
-        public bool LeftMouseClick()
-        {
-            var kdlsf = Mouse.GetState();
-            return Mouse.GetState().LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Released;
-        }
-
-        public bool LeftMouseDown()
-        {
-            return Mouse.GetState().LeftButton == ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Pressed;
-        }
-
-        public bool LeftMouseReleased()
-        {
-            return Mouse.GetState().LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed;
-        }
-
         public bool IsWithinBoard(int x, int y)
         {
             Rectangle rect = new Rectangle(0, 0, BoardWidthInPixels, BoardHeightInPixels);
@@ -80,10 +63,14 @@ namespace CS6613_Final
             return rect.Contains(x, y);
         }
 
-        public void SetSelectedPiece(CheckersPiece p)
+        public bool ShouldDrawGhostPiece
         {
-            selectedPiece = p;
-            cgame.CurrentSelectedPiece = p;
+            get
+            {
+                return CurrentGameState == GameState.MOVING_PIECE &&
+                        Mouse.GetState().LeftButton == ButtonState.Pressed &&
+                        (Mouse.GetState().X != InitialMouseClick.X || Mouse.GetState().Y != InitialMouseClick.Y);
+            }
         }
 
         /// <summary>
@@ -110,34 +97,32 @@ namespace CS6613_Final
 
             cgame = new CheckersBoardGame();
 
-            ILogicDriver pOne = new PlayerLogicDriver();
+            ILogicDriver pOne = new PlayerLogicDriver(this);
             ILogicDriver pTwo = new AILogicDriver();
 
             bool playerWantsToGoFirst = false;
 
-            if (state == GameState.PLAYER_QUERY)
+            if (pOne.IsPlayer || pTwo.IsPlayer)
             {
-                state = GameState.WAITING_FOR_AI;
+                CurrentGameState = GameState.WAITING_FOR_AI;
+                var whichLogicIsPlayer = pOne.IsPlayer ? "Player One" : "Player Two";
 
-                if (pOne is PlayerLogicDriver || pTwo is PlayerLogicDriver)
+                var result = WinForms.MessageBox.Show(String.Format("Would you ({0}) like to go first?", whichLogicIsPlayer), 
+                    "Choice", WinForms.MessageBoxButtons.YesNo);
+
+                if (result == WinForms.DialogResult.Yes)
                 {
-                    var result = WinForms.MessageBox.Show("Would you like to go first?", "Choice", WinForms.MessageBoxButtons.YesNo);
-                    if (result == WinForms.DialogResult.Yes)
-                    {
-                        playerWantsToGoFirst = true;
+                    playerWantsToGoFirst = true;
 
-                        state = GameState.SELECTING_PIECE;
-                    }
-                }                
+                    CurrentGameState = GameState.SELECTING_PIECE;
+                }            
             }
 
-            cgame.Start(6, new PlayerLogicDriver(),
-                new AILogicDriver(),
-                new GUIDrawer(spriteBatch, Content),
+            cgame.Start(6, pOne,
+                pTwo,
+                new GUIDrawer(spriteBatch, Content, this),
                 //new ConsoleDrawer()
                 playerWantsToGoFirst);
-
-
 
             graphics.PreferredBackBufferWidth = BoardWidthInPixels + SIDE_SIZE;
             graphics.PreferredBackBufferHeight = BoardHeightInPixels;
@@ -164,72 +149,12 @@ namespace CS6613_Final
             if (IsActive)
             {
                 // Allows the game to exit
-                if (Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
-                    this.Exit();
+                if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                    Exit();
 
-                //let the player continue doing what hes doing until he makes a move
-                // e.g. clicking a piece and then clicking a new place
-                if (state == GameState.SELECTING_PIECE)
-                {
-                    if (LeftMouseClick())
-                    {
-                        int mx = Mouse.GetState().X, my = Mouse.GetState().Y;
-                        int ix = mx / TILE_SIZE, iy = my / TILE_SIZE;
+                cgame.AttemptTurn();
 
-                        if (IsWithinBoard(mx, my))
-                        {
-                            //see if mouse clicked on a piece
-                            var piece = cgame.GetPieceAtPosition(ix, iy);
-
-                            //see if piece is for the right player
-                            if (piece != null && piece.Color == cgame.CurrentPlayer.Color)
-                            {
-                                state = GameState.MOVING_PIECE;
-                                initialMouseClick = new Vector2(mx, my);
-                                SetSelectedPiece(piece);
-                            }
-                            else { } //ignore the player trying to move a piece that is not his
-                        }
-                        else { } //ignore a click on the board that isnt on a piece
-                    }
-                }
-                else if (state == GameState.MOVING_PIECE)
-                {
-                    int mx = Mouse.GetState().X, my = Mouse.GetState().Y;
-                    ghostSelectedPosition = new Vector2(mx, my);
-                    int ix = mx / TILE_SIZE, iy = my / TILE_SIZE;
-
-                    //user dragged it to a new slot
-                    if (ix != selectedPiece.X && iy != selectedPiece.Y && cgame.CurrentBoard.IsValidLocation(ix, iy))
-                    {
-                        if (LeftMouseClick() || LeftMouseReleased()) //user clicked a new slot
-                        {
-                            try
-                            {
-                                //user potentially clicked a new space for the selectedPiece
-                                var returnVal = cgame.IsMovePossible(cgame.CurrentBoard, selectedPiece.X, selectedPiece.Y, ix, iy, selectedPiece.Color, selectedPiece.Forward);
-
-                                if (returnVal != AvailableMove.NONE)
-                                {
-                                    cgame.MovePiece(selectedPiece, ix, iy);
-                                }
-                                else
-                                    throw new InvalidMoveException(selectedPiece, ix, iy);
-                            }
-                            catch (InvalidMoveException ex)
-                            {
-                                var result = WinForms.MessageBox.Show(String.Format("Error: Invalid move (cannot move {0} to {1}).",
-                                    cgame.CurrentBoard.GetNameForLocation(ex.MovingPiece.X, ex.MovingPiece.Y),
-                                    cgame.CurrentBoard.GetNameForLocation(ex.AttemptedLocation)), "Error", WinForms.MessageBoxButtons.OK);
-
-                                selectedPiece = null;
-                                state = GameState.SELECTING_PIECE;
-                            }
-                        }
-                    }
-                }
-
-                oldMouseState = Mouse.GetState();
+                InputManager.PostUpdate();
             }
 
             base.Update(gameTime);
@@ -244,19 +169,30 @@ namespace CS6613_Final
             GraphicsDevice.Clear(Color.DarkGray);
             spriteBatch.Begin();
 
-            cgame.Draw();    
+            cgame.Draw();
             
-            if(state == GameState.MOVING_PIECE && 
-                    Mouse.GetState().LeftButton == ButtonState.Pressed)
-                    //Mouse.GetState().X == initialMouseClick.X && Mouse.GetState().Y == initialMouseClick.Y)
-                cgame.DrawGhostPiece(selectedPiece, new Location(Mouse.GetState().X, Mouse.GetState().Y));
+            var finalStr = "";
+            finalStr += String.Format("It is {0}'s turn{1}.",
+                cgame.CurrentPlayer.Color,
+                cgame.CurrentPlayer.IsPlayer ? " (YOUR TURN)" : " (COMPUTER's TURN)");
+
+            finalStr += Environment.NewLine + Environment.NewLine;
+
+            if (cgame.SelectedPiece != null)
+                finalStr += String.Format("Selected: {0}", cgame.CurrentBoard.GetNameForLocation(cgame.SelectedPiece.X, cgame.SelectedPiece.Y));
+
+            finalStr += Environment.NewLine + Environment.NewLine;
+            finalStr += "Current state: " + CurrentGameState;
+            finalStr += Environment.NewLine + Environment.NewLine;
+            var mx = Mouse.GetState().X;
+            var my = Mouse.GetState().Y;
+            int ix = mx / TILE_SIZE, iy = my / TILE_SIZE;
+            finalStr += String.Format("({0},{1})", ix, iy);
 
             Utility.DrawStringToFitBox(spriteBatch, 
                 turnFont, 
                 new Rectangle(BoardWidthInPixels, 0, SIDE_SIZE, BoardHeightInPixels), 
-                String.Format("It is {0}'s turn{1}.", 
-                    cgame.CurrentPlayer.Color, 
-                    cgame.CurrentPlayer.IsPlayer ? " (YOUR TURN)" : " (COMPUTER's TURN)"), 
+                finalStr,
                 TextAlignment.H_CENTER, 0, 
                 Color.White, 
                 Color.Black);

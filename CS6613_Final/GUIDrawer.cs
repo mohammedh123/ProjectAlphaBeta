@@ -13,14 +13,16 @@ namespace CS6613_Final
         SpriteBatch spriteBatch; 
         Texture2D blackPiece, blackTile, redPiece, whiteTile;
         ContentManager contentManager;
+        readonly CheckersGame checkersGame;
 
         const int TILE_SIZE = CheckersGame.TILE_SIZE;
         readonly Vector2 tileCenter = new Vector2(TILE_SIZE * 0.5f, TILE_SIZE * 0.5f);
 
-        public GUIDrawer(SpriteBatch sb, ContentManager content)
+        public GUIDrawer(SpriteBatch sb, ContentManager content, CheckersGame game)
         {
             spriteBatch = sb;
             contentManager = content;
+            checkersGame = game;
 
             LoadImages();
         }
@@ -33,7 +35,7 @@ namespace CS6613_Final
             whiteTile = contentManager.Load<Texture2D>("whitetile");
         }
 
-        public override void Draw(Board board, IEnumerable<CheckersPiece> pieces)
+        public override void Draw(Board board, IEnumerable<CheckersPiece> pieces, CheckersPiece selectedPiece = null)
         {
             Texture2D tileTexture;
             for (int i = 0; i < board.Width; i++)
@@ -53,9 +55,12 @@ namespace CS6613_Final
 
                 spriteBatch.Draw(pieceTexture, new Rectangle(piece.X * TILE_SIZE, piece.Y * TILE_SIZE, TILE_SIZE, TILE_SIZE), Color.White);
             }
+
+            if(checkersGame.ShouldDrawGhostPiece)
+                DrawGhostPiece(board, selectedPiece, InputManager.GetLocationFromMouse());
         }
 
-        public override void DrawGhostPiece(Board board, CheckersPiece ghostPiece, Location pixelCoords)
+        protected override void DrawGhostPiece(Board board, CheckersPiece ghostPiece, Location pixelCoords)
         {
             var pieceTexture = ghostPiece.Color == PieceColor.BLACK ? blackPiece : redPiece;
 

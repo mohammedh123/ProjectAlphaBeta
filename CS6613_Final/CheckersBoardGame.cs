@@ -24,9 +24,9 @@ namespace CS6613_Final
         FORWARD
     }
 
-    class CheckersBoardGame
+    class CheckersBoard
     {
-        public Board CurrentBoard { get; private set; }
+        public Board Board { get; set; }
         public List<CheckersPiece> PlayerOnePieces { get; set; }
         public List<CheckersPiece> PlayerTwoPieces { get; set; }
 
@@ -45,6 +45,11 @@ namespace CS6613_Final
                 return PlayerOnePieces.Where(p => p.InPlay).Union(PlayerTwoPieces.Where(p => p.InPlay));
             }
         }
+    }
+
+    class CheckersBoardGame
+    {
+        public CheckersBoard Board { get; set; }
 
         public ILogicDriver CurrentPlayer
         {
@@ -56,8 +61,26 @@ namespace CS6613_Final
                     return playerTwo;
             }
         }
+        
+        public CheckersPiece SelectedPiece
+        {
+            get
+            {
+                CheckersPiece selectedPiece = null;
 
-        public CheckersPiece CurrentSelectedPiece { get; set; }
+                if(playerOne.IsPlayer || playerTwo.IsPlayer)
+                {
+                    if (playerOne.IsPlayer) 
+                        selectedPiece = (playerOne as PlayerLogicDriver).CurrentSelectedPiece;
+                    if(selectedPiece == null && playerTwo.IsPlayer)
+                        selectedPiece = (playerTwo as PlayerLogicDriver).CurrentSelectedPiece;
+
+                    return selectedPiece;
+                }
+
+                return null;
+            }
+        }
 
         bool isBlackTurn = true;
         ILogicDriver playerOne, playerTwo;
@@ -65,8 +88,14 @@ namespace CS6613_Final
 
         public void Start(int numPieces, ILogicDriver pOne, ILogicDriver pTwo, IDisplayDriver displayer, bool playerWantsToGoFirst)
         {
-            Random r = new Random();
-            CurrentBoard = new Board(6, 6);
+            var r = new Random();
+            Board = new CheckersBoard
+                        {
+                            Board = new Board(6, 6),
+                            PlayerOnePieces = new List<CheckersPiece>(),
+                            PlayerTwoPieces = new List<CheckersPiece>()
+                        };
+
             var pOneColor = r.Next(0, 2); // 0 = black, 1 = red
 
             if (playerWantsToGoFirst)
@@ -306,10 +335,20 @@ namespace CS6613_Final
         public IEnumerable<Board> GetAvailableMoves(Board board, int x, int y, PieceDirection forward)
         {
             var boards = new List<Board>();
-
-
-
+            
             return boards;
+        }
+
+        public IEnumerable<Board> GetAllAvailableMoves(Board board, PieceColor color)
+        {
+            var availables = new List<Board>();
+
+            foreach(var piece in InPlayPieces.Where(cp => cp.Color == color))
+            {
+                availables.AddRange(GetAvailableMoves(board, piece.X, piece.Y, piece.Forward));
+            }
+
+            return availables;
         }
 
         public AvailableMove IsMovePossible(Board board, int x, int y, int nx, int ny, PieceColor color, PieceDirection forward)
@@ -350,26 +389,36 @@ namespace CS6613_Final
             return AvailableMove.NONE;
         }
 
-        public void MovePiece(CheckersPiece piece, int nx, int ny)
+        public TurnResult MovePiece(CheckersPiece piece, int nx, int ny)
         {
             piece.X = nx;
             piece.Y = ny;
+
+            return TurnResult.Finished;
         }
 
         public void Draw()
         {
-            displayer.Draw(CurrentBoard, InPlayPieces);
+            displayer.Draw(CurrentBoard, InPlayPieces, SelectedPiece);
         }
 
-        public void DrawGhostPiece(CheckersPiece piece, Location pixelCoords)
+        public bool IsGameOver()
         {
-            displayer.DrawGhostPiece(CurrentBoard, piece, pixelCoords);
+            return InPlayPieces.All(cp => cp.Color == PieceColor.BLACK) ||
+                   InPlayPieces.All(cp => cp.Color == PieceColor.RED);
+
         }
 
-        public void Turn()
+        public void AttemptTurn()
         {
-            CurrentPlayer.GetNextMove(CurrentBoard);
+            var result = CurrentPlayer.GetNextMove(this);
 
+            if(result == TurnResult.Finished)
+                SwitchPlayer();
+        }
+
+        public void SwitchPlayer()
+        {
             isBlackTurn = !isBlackTurn;
         }
     }
