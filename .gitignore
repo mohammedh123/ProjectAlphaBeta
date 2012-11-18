@@ -1,7 +1,8 @@
-﻿*.exe
+*.exe
 *.txt
 *.pdb
 *.exe
 bin
 CS6613_Final.csproj.*
 obj/*
+CS6613_FinalContent/obj/*
