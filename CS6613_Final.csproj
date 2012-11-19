@@ -38,7 +38,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\x86\Debug</OutputPath>
+    <OutputPath>CS6613_Final\bin\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -120,7 +120,9 @@
     <Compile Include="GUIDrawer.cs" />
     <Compile Include="IDisplayDriver.cs" />
     <Compile Include="ILogicDriver.cs" />
+    <Compile Include="InputManager.cs" />
     <Compile Include="InvalidMoveException.cs" />
+    <Compile Include="Jump.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="PlayerLogicDriver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
