@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace CS6613_Final
 {
-    class AILogicDriver : ILogicDriver
+    internal class ComputerLogicDriver : LogicDriver
     {
         //must be implemented by all logic driver's
         // return true if it is done finding its next move
@@ -19,7 +16,9 @@ namespace CS6613_Final
             if (game.IsGameOver())
                 return 1; //TODO: FIX THIS CHECK/RET VAL
 
-            var possibleMoves = game.GetAllAvailableMoves(game.Board, Color);
+            var possibleMoves = game.Board.GetAllAvailableMoves(Color);
+
+
 
             return 0;
         }

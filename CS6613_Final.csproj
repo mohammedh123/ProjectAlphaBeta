@@ -112,7 +112,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AILogicDriver.cs" />
+    <Compile Include="CheckersBoard.cs" />
+    <Compile Include="ComputerLogicDriver.cs" />
     <Compile Include="Board.cs" />
     <Compile Include="CheckersBoardGame.cs" />
     <Compile Include="CheckersPiece.cs" />

@@ -1,40 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace CS6613_Final
 {
+    [Flags]
     public enum TextAlignment
     {
-        H_LEFT      =   0x01,
-        H_CENTER    =   0x02,
-        H_RIGHT     =   0x04
+        Left = 0x01,
+        Center = 0x02,
+        Right = 0x04
     }
 
-    static class Utility
-    {        
-        public static void DrawStringToFitBox(SpriteBatch g, SpriteFont f, Rectangle box, string text, TextAlignment align, int padding, Color c, Color bg)
+    internal static class Utility
+    {
+        public static void DrawStringToFitBox(SpriteBatch g, SpriteFont f, Rectangle box, string text,
+                                              TextAlignment align, int padding, Color c, Color bg)
         {
-            int lcharIndex = 0, rcharIndex = (int)(text.IndexOf(" "));
+            int lcharIndex = 0, rcharIndex = (text.IndexOf(" "));
             string textToWrite = text.Substring(lcharIndex, rcharIndex);
-            Vector2 position = new Vector2(box.X + padding, box.Y + padding);
+            var position = new Vector2(box.X + padding, box.Y + padding);
 
             Vector2 fontDimensions = f.MeasureString(textToWrite);
-            Rectangle newB = new Rectangle(box.Left, box.Top, box.Width, padding);
+            var newB = new Rectangle(box.Left, box.Top, box.Width, padding);
 
             //loop through strings' words until width is surpassed, once this happens, iterate backwards to last space found
             //go to next line in box
-            List<string> stringsToDraw = new List<string>();
+            var stringsToDraw = new List<string>();
 
             while (rcharIndex != text.Count())
             {
                 int idxOfNewline = -1;
 
                 int lastCharIndex = 0;
-                while ((fontDimensions.X < box.Width - padding * 2) && rcharIndex != text.Count())
+                while ((fontDimensions.X < box.Width - padding*2) && rcharIndex != text.Count())
                 {
                     lastCharIndex = rcharIndex;
 
@@ -56,21 +57,21 @@ namespace CS6613_Final
                         lastCharIndex = rcharIndex;
                         break;
                     }
-                    
+
 
                     fontDimensions = f.MeasureString(textToWrite);
                 }
 
                 rcharIndex = lastCharIndex;
 
-                if(idxOfNewline < 0)
-                    textToWrite = text.Substring(lcharIndex, rcharIndex-lcharIndex);
+                if (idxOfNewline < 0)
+                    textToWrite = text.Substring(lcharIndex, rcharIndex - lcharIndex);
 
                 stringsToDraw.Add(textToWrite);
 
                 lcharIndex = rcharIndex;
 
-                newB.Height += (int)fontDimensions.Y;
+                newB.Height += (int) fontDimensions.Y;
                 fontDimensions = Vector2.Zero;
             }
 
@@ -80,15 +81,14 @@ namespace CS6613_Final
             {
                 fontDimensions = f.MeasureString(s);
                 position = new Vector2(box.X + padding, position.Y);
-                if ((align & TextAlignment.H_CENTER) == TextAlignment.H_CENTER)
-                    position += new Vector2((int)(box.Width*0.5f - fontDimensions.X * 0.5f), 0);
-                else if ((align & TextAlignment.H_RIGHT) == TextAlignment.H_RIGHT)
+                if ((align & TextAlignment.Center) == TextAlignment.Center)
+                    position += new Vector2((int) (box.Width*0.5f - fontDimensions.X*0.5f), 0);
+                else if ((align & TextAlignment.Right) == TextAlignment.Right)
                     position += new Vector2(box.Width - fontDimensions.X, 0);
 
                 g.DrawString(f, s, position, c);
                 position.Y += fontDimensions.Y;
             }
-            
         }
     }
 }
