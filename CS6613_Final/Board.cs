@@ -1,37 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace CS6613_Final
+﻿namespace CS6613_Final
 {
     public enum TileColor
     {
-        BLACK,
-        WHITE
+        Black,
+        White
     }
 
-    class Board
+    internal class Board
     {
-        public int Width    { get; private set; }
-        public int Height   { get; private set; }
-
-        public Tile[,] Tiles { get; private set; }
-
         public Board(int width, int height)
         {
             Width = width;
             Height = height;
 
-            Tiles = new Tile[width, height];
+            Tiles = new Tile[width,height];
 
-            for(int i = 0; i < width; i++)
+            for (int i = 0; i < width; i++)
                 for (int j = 0; j < height; j++)
                 {
-                    bool isTileBlack = (j + i) % 2 != 0;
-                    Tiles[i, j] = new Tile(i, j, isTileBlack ? TileColor.BLACK : TileColor.WHITE);
+                    bool isTileBlack = (j + i)%2 != 0;
+                    Tiles[i, j] = new Tile(i, j, isTileBlack ? TileColor.Black : TileColor.White);
                 }
         }
+
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
+        public Tile[,] Tiles { get; private set; }
 
         public Tile GetTile(int x, int y)
         {
@@ -40,9 +35,8 @@ namespace CS6613_Final
 
         public string GetNameForLocation(int x, int y)
         {
-            char row, column;
-            row = (char)('1' - 1 + Height - y);
-            column = (char)('A' + x);
+            var row = (char) ('1' - 1 + Height - y);
+            var column = (char) ('A' + x);
 
             return "" + row + column;
         }

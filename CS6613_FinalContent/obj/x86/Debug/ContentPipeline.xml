@@ -7,7 +7,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>c:\users\mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blackpiece.xnb</Output>
+      <Output>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blackpiece.xnb</Output>
       <Time>2012-11-05T17:05:32.1055617-05:00</Time>
     </Item>
     <Item>
@@ -16,7 +16,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>c:\users\mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blacktile.xnb</Output>
+      <Output>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blacktile.xnb</Output>
       <Time>2012-11-05T14:45:28.3370885-05:00</Time>
     </Item>
     <Item>
@@ -25,7 +25,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>c:\users\mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\redpiece.xnb</Output>
+      <Output>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\redpiece.xnb</Output>
       <Time>2012-11-05T17:05:26.2645535-05:00</Time>
     </Item>
     <Item>
@@ -34,7 +34,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>c:\users\mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\whitetile.xnb</Output>
+      <Output>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\whitetile.xnb</Output>
       <Time>2012-11-05T14:45:42.149108-05:00</Time>
     </Item>
     <Item>
@@ -43,7 +43,7 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\turnFont.xnb</Output>
+      <Output>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\turnFont.xnb</Output>
       <Time>2012-11-05T18:17:30.838757-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
@@ -55,7 +55,7 @@
       <RootDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_FinalContent\</RootDirectory>
       <LoggerRootDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\</LoggerRootDirectory>
       <IntermediateDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_FinalContent\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\</OutputDirectory>
+      <OutputDirectory>C:\Users\Mohammed\documents\visual studio 2010\Projects\CS6613_Final\CS6613_Final\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>

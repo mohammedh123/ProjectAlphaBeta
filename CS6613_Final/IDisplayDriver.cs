@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace CS6613_Final
 {
-    abstract class IDisplayDriver
+    internal abstract class DisplayDriver
     {
         public abstract void Draw(Board board, IEnumerable<CheckersPiece> pieces, CheckersPiece selectedPiece = null);
-        protected virtual void DrawGhostPiece(Board board, CheckersPiece ghostPiece, Location pixelCoords) { }
+
+        protected virtual void DrawGhostPiece(Board board, CheckersPiece ghostPiece, Location pixelCoords)
+        {
+        }
     }
 }

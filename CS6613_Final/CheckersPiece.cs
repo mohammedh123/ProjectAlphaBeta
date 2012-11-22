@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace CS6613_Final
 {
     public class CheckersPiece : IEquatable<CheckersPiece>
     {
-        public bool InPlay { get; set; }
-        public PieceColor Color { get; private set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public PieceDirection Forward { get; private set; }
-
         public CheckersPiece(int x, int y, PieceColor color, PieceDirection forward)
         {
             X = x;
@@ -24,21 +14,32 @@ namespace CS6613_Final
             Forward = forward;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
+        public bool InPlay { get; set; }
+        public PieceColor Color { get; private set; }
+        public int X { get; set; }
+        public int Y { get; set; }
 
-            CheckersPiece objp = obj as CheckersPiece;
-            if ((object)objp == null)
+        public PieceDirection Forward { get; private set; }
+
+        #region IEquatable<CheckersPiece> Members
+
+        public bool Equals(CheckersPiece objp)
+        {
+            if (objp == null)
                 return false;
 
             return X == objp.X && Y == objp.Y && Color == objp.Color && InPlay == objp.InPlay;
         }
 
-        public bool Equals(CheckersPiece objp)
+        #endregion
+
+        public override bool Equals(object obj)
         {
-            if ((object)objp == null)
+            if (obj == null)
+                return false;
+
+            var objp = obj as CheckersPiece;
+            if (objp == null)
                 return false;
 
             return X == objp.X && Y == objp.Y && Color == objp.Color && InPlay == objp.InPlay;

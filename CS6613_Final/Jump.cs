@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace CS6613_Final
 {
     public class Jump
     {
-        public Location FinalLocation { get; set; }
-        public List<Location> LocationsJumpedOver { get; set; }
-
         public Jump(Location finalLocation)
         {
-            LocationsJumpedOver = new List<Location>();
             FinalLocation = finalLocation;
         }
+
+        public Location FinalLocation { get; set; }
     }
 }
