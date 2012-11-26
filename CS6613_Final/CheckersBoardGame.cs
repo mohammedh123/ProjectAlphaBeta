@@ -27,7 +27,6 @@ namespace CS6613_Final
     {
         BlackWins,
         RedWins,
-        Tie,
         StillGoing
     }
 

@@ -25,6 +25,9 @@ namespace CS6613_Final
 
         public override TurnResult GetNextMove(CheckersBoardGame game)
         {
+            if(_checkersGame.CurrentGameState == GameState.WaitingForComputer)
+                _checkersGame.CurrentGameState = GameState.SelectingPiece;
+
             var result = TurnResult.NotDone;
 
             //let the player continue doing what hes doing until he makes a move
@@ -47,7 +50,7 @@ namespace CS6613_Final
                             _checkersGame.CurrentGameState = GameState.MovingPiece;
                             _checkersGame.InitialMouseClick = new Location(mx, my);
                             CurrentSelectedPiece = piece;
-                            var moves = game.Board.GetAvailableMoves(piece).ToList();
+                            var moves = game.Board.GetAvailableMoves(piece, false).ToList();
                             foreach(var move in moves)
                                 Console.WriteLine("Possible move: {0}", move.ToString());
                         }

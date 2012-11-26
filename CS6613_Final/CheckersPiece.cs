@@ -45,6 +45,11 @@ namespace CS6613_Final
             return X == objp.X && Y == objp.Y && Color == objp.Color && InPlay == objp.InPlay;
         }
 
+        public override string ToString()
+        {
+            return String.Format("[{0},{1}] : {2}", X, Y, Color);
+        }
+
         public override int GetHashCode()
         {
             return X.GetHashCode() ^ Y.GetHashCode() ^ InPlay.GetHashCode() ^ Color.GetHashCode();

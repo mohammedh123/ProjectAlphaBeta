@@ -118,12 +118,12 @@ namespace CS6613_Final
             return possibleEndValues;
         }
         
-        public IEnumerable<MoveResult> GetAvailableMoves(CheckersPiece piece)
+        public IEnumerable<MoveResult> GetAvailableMoves(CheckersPiece piece, bool jumpsOnly)
         {
             var boards = new List<MoveResult>();
             var jumpsAvailable = GetAvailableJumps(piece).ToList();
 
-            if (jumpsAvailable.Any())
+            if (jumpsAvailable.Any() || jumpsOnly)
             {
                 foreach (var jump in jumpsAvailable)
                 {
@@ -159,7 +159,7 @@ namespace CS6613_Final
 
             foreach (var piece in InPlayPieces.Where(cp => cp.Color == color))
             {
-                availables.AddRange(GetAvailableMoves(piece));
+                availables.AddRange(GetAvailableMoves(piece, availables.Any(mr => mr.TypeOfMove == MoveType.Jump)));
             }
 
             // if there are any jumps, you must take a jump
@@ -241,7 +241,7 @@ namespace CS6613_Final
 
         public bool IsGameOver(GameResult res)
         {
-            return res == GameResult.RedWins || res == GameResult.BlackWins || res == GameResult.Tie;
+            return res == GameResult.RedWins || res == GameResult.BlackWins;
         }
 
         public TurnResult MovePiece(MoveType type, CheckersPiece piece, int nx, int ny)
