@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace CS6613_Final
 {
-    struct AlphaBetaReturnValue
+    class AlphaBetaReturnValue
     {
-        public int Value;
-        public MoveResult Move;
-        public int Depth;
+        public int Value { get; set; }
+        public MoveResult Move { get; set; }
+        public int Depth { get; set; }
 
         public AlphaBetaReturnValue(int value, MoveResult m, int maxDepth)
         {
