@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS6613_Final", "CS6613_Final.csproj", "{DDE5FE23-7F9D-47D8-9FCC-1E2AC73B21A7}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS6613_FinalContent", "CS6613_FinalContent\CS6613_FinalContent.contentproj", "{CAEBFEC3-E6A7-4B67-B8F5-3D2E947753ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS6613_Final", "CS6613_Final\CS6613_Final.csproj", "{DDE5FE23-7F9D-47D8-9FCC-1E2AC73B21A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +11,12 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CAEBFEC3-E6A7-4B67-B8F5-3D2E947753ED}.Debug|x86.ActiveCfg = Debug|x86
+		{CAEBFEC3-E6A7-4B67-B8F5-3D2E947753ED}.Release|x86.ActiveCfg = Release|x86
 		{DDE5FE23-7F9D-47D8-9FCC-1E2AC73B21A7}.Debug|x86.ActiveCfg = Debug|x86
 		{DDE5FE23-7F9D-47D8-9FCC-1E2AC73B21A7}.Debug|x86.Build.0 = Debug|x86
 		{DDE5FE23-7F9D-47D8-9FCC-1E2AC73B21A7}.Release|x86.ActiveCfg = Release|x86
 		{DDE5FE23-7F9D-47D8-9FCC-1E2AC73B21A7}.Release|x86.Build.0 = Release|x86
-		{CAEBFEC3-E6A7-4B67-B8F5-3D2E947753ED}.Debug|x86.ActiveCfg = Debug|x86
-		{CAEBFEC3-E6A7-4B67-B8F5-3D2E947753ED}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
