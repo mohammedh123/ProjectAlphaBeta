@@ -108,13 +108,24 @@ namespace CS6613_Final
             foreach(var m in moves)
             {
                 var resultingBoard = board.Clone();
-                resultingBoard.MovePiece(m.TypeOfMove,
+                
+                var moveResult = resultingBoard.MovePiece(m.TypeOfMove,
                                             resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
                                                                               m.OriginalPieceLocation.Y),
                                             m.FinalPieceLocation.X, m.FinalPieceLocation.Y);
 
-                var newDepth = currentDepth + 1;
-                retVal = MinValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
+                var newDepth = currentDepth;
+
+                if(moveResult == TurnResult.NotDone)
+                {
+                    retVal = MaxValue(resultingBoard, ref alphaValue, ref betaValue, color, ref newDepth, ref maxDepth);
+                }
+                else if(moveResult == TurnResult.Finished)
+                {
+                    newDepth++; 
+                    retVal = MinValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
+                }
+              
                 retVal.Move = m;
                 
                 if (retVal.Depth > maxDepth)
@@ -156,17 +167,26 @@ namespace CS6613_Final
 
                 return retVal;
             }
-
+            
             foreach (var m in moves)
             {
                 var resultingBoard = board.Clone();
-                resultingBoard.MovePiece(m.TypeOfMove,
+                var moveResult = resultingBoard.MovePiece(m.TypeOfMove,
                                             resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
                                                                               m.OriginalPieceLocation.Y),
                                             m.FinalPieceLocation.X, m.FinalPieceLocation.Y);
                 
-                var newDepth = currentDepth + 1;
-                retVal = MaxValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
+                var newDepth = currentDepth;
+                if(moveResult == TurnResult.NotDone)
+                {
+                    retVal = MinValue(resultingBoard, ref alphaValue, ref betaValue, color, ref newDepth, ref maxDepth);
+                }
+                else if(moveResult == TurnResult.Finished)
+                {
+                    newDepth++;
+                    retVal = MaxValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
+                }
+                
                 retVal.Move = m;
 
                 if (retVal.Depth > maxDepth)

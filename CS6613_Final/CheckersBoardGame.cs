@@ -153,7 +153,7 @@ namespace CS6613_Final
 
         public void AttemptTurn()
         {
-            TurnResult result = CurrentPlayer.GetNextMove(this);
+            var result = CurrentPlayer.GetNextMove(this);
 
             if (result == TurnResult.Finished)
                 SwitchPlayer();
