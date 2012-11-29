@@ -20,7 +20,7 @@ namespace CS6613_Final
         public int Y { get; set; }
 
         public PieceDirection Forward { get; private set; }
-
+        
         #region IEquatable<CheckersPiece> Members
 
         public bool Equals(CheckersPiece objp)

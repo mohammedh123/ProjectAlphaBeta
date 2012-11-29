@@ -73,64 +73,94 @@ namespace CS6613_Final
         }
 
         //returns IEnumerable<Final Location, List of Locations jumped
-        public IEnumerable<Jump> GetAvailableJumps(CheckersPiece piece)
+        public IEnumerable<Jump> GetAvailableJumps(int pieceX, int pieceY, PieceColor pieceColor, Location? jumpedLoc = null)
         {
+            var possibleEndValues = new List<Jump>();
             //check 4 corners
-            var possibleEndValues = new List<Jump>
+            var potentialJumpedLocs = new List<Location>
                                         {
-                                            new Jump(new Location(piece.X - 1, piece.Y - 1)),
-                                            new Jump(new Location(piece.X + 1, piece.Y - 1)),
-                                            new Jump(new Location(piece.X - 1, piece.Y + 1)),
-                                            new Jump(new Location(piece.X + 1, piece.Y + 1))
+                                            new Location(pieceX - 1, pieceY - 1),
+                                            new Location(pieceX + 1, pieceY - 1),
+                                            new Location(pieceX - 1, pieceY + 1),
+                                            new Location(pieceX + 1, pieceY + 1)
                                         };
 
+            //remove locations that were jumped
+            if(jumpedLoc != null)
+                potentialJumpedLocs.RemoveAll(p => p == jumpedLoc);
+
             //remove all locations that are invalid
-            possibleEndValues.RemoveAll(p => !TileBoard.IsValidLocation(p.FinalLocation.X, p.FinalLocation.Y));
+            potentialJumpedLocs.RemoveAll(p => !TileBoard.IsValidLocation(p));
 
             //remove all locations that do not land on a piece [we want to jump over that piece]
-            possibleEndValues.RemoveAll(p => GetPieceAtPosition(p.FinalLocation.X, p.FinalLocation.Y) == null);
+            potentialJumpedLocs.RemoveAll(p => GetPieceAtPosition(p) == null);
 
             //remove all locations that land on a piece of the same color
-            possibleEndValues.RemoveAll(p => GetPieceAtPosition(p.FinalLocation.X, p.FinalLocation.Y).Color == piece.Color);
+            potentialJumpedLocs.RemoveAll(p => GetPieceAtPosition(p).Color == pieceColor);
 
             //now all the locations in possibleEndValues are pieces that we can jump over - advance them all forward
             //check if the final location is now valid (within game board)
-            for (var i = possibleEndValues.Count-1; i >= 0; i--)
+            for (var i = potentialJumpedLocs.Count-1; i >= 0; i--)
             {
-                var pos = possibleEndValues[i];
+                var jump = new Jump();
+                var pos = potentialJumpedLocs[i];
+                var recentlyJumpedLoc = new Location();
 
-                var dirX = pos.FinalLocation.X - piece.X;
-                var dirY = pos.FinalLocation.Y - piece.Y;
+                var dirX = pos.X - pieceX;
+                var dirY = pos.Y - pieceY;
 
-                var newFinalLoc = pos.FinalLocation;
+                var newFinalLoc = recentlyJumpedLoc = pos;
                 newFinalLoc.X += dirX;
                 newFinalLoc.Y += dirY;
 
                 if (TileBoard.IsValidLocation(newFinalLoc) && GetPieceAtPosition(newFinalLoc) == null)
                 {
-                    pos.FinalLocation = newFinalLoc;
+                    jump.AddJumpedLocation(new JumpResult(recentlyJumpedLoc, newFinalLoc));
+
+                    var jumpsAvailableAgain =
+                        GetAvailableJumps(newFinalLoc.X, newFinalLoc.Y, pieceColor, recentlyJumpedLoc).
+                            ToList();
+
+                    if (jumpsAvailableAgain.Any())
+                    {
+                        foreach (var newJump in jumpsAvailableAgain)
+                        {
+                            var branchOfJump = jump.Clone();
+                            //skip any further jumps that jump back to where we started
+                            if (newJump.LocationsJumped.Any(jres => jres.JumpedLocation == new Location(pieceX, pieceY)))
+                                break;
+
+                            branchOfJump.LocationsJumped.AddRange(newJump.LocationsJumped);
+
+                            possibleEndValues.Add(branchOfJump);
+                        }
+                    }
+                    else
+                    {
+                        possibleEndValues.Add(jump);
+                    }
                 }
-                else
-                    possibleEndValues.RemoveAt(i);
             }
             //at this point possibleEndValues has the final location of the jump
 
             return possibleEndValues;
         }
-        
+
         public IEnumerable<MoveResult> GetAvailableMoves(CheckersPiece piece, bool jumpsOnly)
         {
-            var boards = new List<MoveResult>();
-            var jumpsAvailable = GetAvailableJumps(piece).ToList();
+            var moveResults = new List<MoveResult>();
+            var jumpsAvailable = GetAvailableJumps(piece.X, piece.Y, piece.Color).ToList();
 
             if (jumpsAvailable.Any() || jumpsOnly)
             {
                 foreach (var jump in jumpsAvailable)
                 {
-                    boards.Add(new MoveResult(MoveType.Jump, piece, jump.FinalLocation.X, jump.FinalLocation.Y));
+                    var mr =new MoveResult(MoveType.Jump, piece, jump.FinalLocation.X, jump.FinalLocation.Y)
+                                {JumpResults = jump.LocationsJumped};
+                    moveResults.Add(mr);
                 }
 
-                return boards; //user must make a jummp
+                return moveResults; //user must make a jummp
             }
 
             var possibleEndValues = new List<Location>
@@ -147,10 +177,10 @@ namespace CS6613_Final
 
             foreach (var possibleEndValue in possibleEndValues)
             {
-                boards.Add(new MoveResult(MoveType.Forward, piece, possibleEndValue.X, possibleEndValue.Y));
+                moveResults.Add(new MoveResult(MoveType.Forward, piece, possibleEndValue.X, possibleEndValue.Y));
             }
 
-            return boards;
+            return moveResults;
         }
 
         public IEnumerable<MoveResult> GetAllAvailableMoves(PieceColor color)
@@ -169,45 +199,32 @@ namespace CS6613_Final
             return availables;
         }
 
-        public MoveType IsMovePossible(CheckersPiece piece, int nx, int ny)
+        public MoveType IsMovePossible(CheckersPiece piece, int nx, int ny, IEnumerable<MoveResult> possibleMoves)
         {
             var sx = Math.Abs(nx - piece.X);
             var sy = Math.Abs(ny - piece.Y);
 
-            if (sx != sy) //pieces can only move diagonally
-                throw new InvalidMoveException(piece, nx, ny);
-
-            var totalDisplacement = sx + sy;
-
-            if (totalDisplacement < 2) //if you are trying to move directly 1 space [up, down, left, right], no-go
-                throw new InvalidMoveException(piece, nx, ny);
-
-            if (totalDisplacement == 2) //if diagonal move 1 space
+            var isMovePossible = true;
+            foreach(var possibleMove in possibleMoves)
             {
-                //forward movement can only be forward
-                if (ny - piece.Y != (int)piece.Forward)
-                    throw new InvalidMoveException(piece, nx, ny);
-
-                if (TileBoard.IsValidLocation(nx, ny) && GetPieceAtPosition(nx, ny) == null)
+                if (possibleMove.TypeOfMove == MoveType.Forward)
                 {
-                    return MoveType.Forward;
+                    if (possibleMove.FinalPieceLocation.X == nx && possibleMove.FinalPieceLocation.Y == ny)
+                        return MoveType.Forward;
+                }
+                else if(possibleMove.TypeOfMove == MoveType.Jump)
+                {
+                    if (possibleMove.JumpResults.Any(jr => jr.FinalLocation.X == nx && jr.FinalLocation.Y == ny))
+                        return MoveType.Jump;
                 }
             }
-            else if (totalDisplacement == 4) //a jump
-            {
-                var jump = IsJumpAvailable(piece, nx, ny);
-
-                if (jump != null)
-                    return MoveType.Jump;
-                return MoveType.None;
-            }
-
-            return MoveType.None;
+        
+            throw new InvalidMoveException(piece, nx, ny);
         }
 
         private Jump IsJumpAvailable(CheckersPiece piece, int nx, int ny)
         {
-            return GetAvailableJumps(piece).FirstOrDefault(j => j.FinalLocation.X == nx && j.FinalLocation.Y == ny);
+            return GetAvailableJumps(piece.X, piece.Y, piece.Color).FirstOrDefault(j => j.FinalLocation.X == nx && j.FinalLocation.Y == ny);
         }
 
         public GameResult GetGameResultState(PieceColor currentPlayer)
@@ -257,7 +274,7 @@ namespace CS6613_Final
 
                 GetPieceAtPosition(loc).InPlay = false;
 
-                if (GetAvailableJumps(piece).Any())
+                if (GetAvailableJumps(piece.X, piece.Y, piece.Color).Any())
                 {
                     return TurnResult.NotDone;
                 }

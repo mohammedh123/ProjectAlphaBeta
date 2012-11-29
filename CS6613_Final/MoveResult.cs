@@ -8,6 +8,7 @@ namespace CS6613_Final
     internal class MoveResult
     {
         public MoveType TypeOfMove { get; set; }
+        public IEnumerable<JumpResult> JumpResults { get; set; } 
         public Location OriginalPieceLocation { get; set; }
         public Location FinalPieceLocation { get; set; }
 
@@ -16,6 +17,8 @@ namespace CS6613_Final
             TypeOfMove = type;
             OriginalPieceLocation = new Location(piece.X, piece.Y);
             FinalPieceLocation = new Location(nx, ny);
+
+            JumpResults = new List<JumpResult>();
         }
 
         public override string ToString()
