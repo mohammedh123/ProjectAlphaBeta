@@ -124,6 +124,7 @@
     <Compile Include="InputManager.cs" />
     <Compile Include="InvalidMoveException.cs" />
     <Compile Include="Jump.cs" />
+    <Compile Include="JumpResult.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="MoveResult.cs" />
     <Compile Include="PlayerLogicDriver.cs" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -10,6 +11,7 @@ namespace CS6613_Final
     internal class PlayerLogicDriver : LogicDriver
     {
         private readonly CheckersGame _checkersGame;
+        private IEnumerable<MoveResult> possibleMoves = null; 
 
         public PlayerLogicDriver(CheckersGame game)
         {
@@ -21,6 +23,18 @@ namespace CS6613_Final
         public override bool IsPlayer
         {
             get { return true; }
+        }
+
+        private void SetSelectedPiece(CheckersBoardGame game, CheckersPiece piece)
+        {
+            CurrentSelectedPiece = piece;
+            possibleMoves = game.Board.GetAvailableMoves(piece, false);
+
+            foreach (var move in possibleMoves)
+                Console.WriteLine("Possible moves: {0} {1}", move.ToString(),
+                                  move.TypeOfMove == MoveType.Jump
+                                      ? String.Format(" over {0}", String.Join(", ", move.JumpResults.Select(jr => jr.JumpedLocation)))
+                                      : "");
         }
 
         public override TurnResult GetNextMove(CheckersBoardGame game)
@@ -49,10 +63,8 @@ namespace CS6613_Final
                         {
                             _checkersGame.CurrentGameState = GameState.MovingPiece;
                             _checkersGame.InitialMouseClick = new Location(mx, my);
-                            CurrentSelectedPiece = piece;
-                            var moves = game.Board.GetAvailableMoves(piece, false).ToList();
-                            foreach(var move in moves)
-                                Console.WriteLine("Possible move: {0}", move.ToString());
+
+                            SetSelectedPiece(game, piece);
                         }
                         else
                         {
@@ -81,13 +93,19 @@ namespace CS6613_Final
                             var clickedPiece = game.Board.GetPieceAtPosition(ix, iy);
 
                             if (clickedPiece != null && clickedPiece.Color == Color)
-                                CurrentSelectedPiece = clickedPiece;
+                                SetSelectedPiece(game, clickedPiece);
                             else if (game.Board.TileBoard.IsValidLocation(ix, iy))
                             {
                                 //user potentially clicked a new space for the CurrentSelectedPiece
-                                var returnVal = game.Board.IsMovePossible(CurrentSelectedPiece, ix, iy);
+                                var returnVal = game.Board.IsMovePossible(CurrentSelectedPiece, ix, iy, possibleMoves);
 
-                                if (returnVal != MoveType.None)
+                                //move is valid - now see if there are any jumps
+                                //if there are, and the move isn't a jump, then it is not valid
+
+                                var anyJumpPossible =
+                                    game.Board.GetAllAvailableMoves(Color).Any(m => m.TypeOfMove == MoveType.Jump);
+                                
+                                if ((anyJumpPossible && returnVal == MoveType.Jump) || (!anyJumpPossible && returnVal != MoveType.None))
                                 {
                                     result = game.Board.MovePiece(returnVal, CurrentSelectedPiece, ix, iy);
                                     _checkersGame.CurrentGameState = GameState.SelectingPiece;

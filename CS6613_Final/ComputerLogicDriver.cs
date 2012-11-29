@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 
 namespace CS6613_Final
 {
@@ -21,10 +22,16 @@ namespace CS6613_Final
     {
         public const int NegativeInfinity = -1000;
         public const int PositiveInfinity =  1000;
+
+        private Thread _logicThread = null;
+
+        public DateTime AlphaBetaStartTime { get; set; }
+
         private int NodesGenerated { get; set; }
         private int NumberOfMaxPrunes { get; set; }
         private int NumberOfMinPrunes { get; set; }
-        public DateTime AlphaBetaStartTime { get; set; }
+
+        private TurnResult _finalResult = TurnResult.NotDone;
 
         public ComputerLogicDriver()
         {
@@ -46,29 +53,39 @@ namespace CS6613_Final
         // return true if it is done finding its next move
         public override TurnResult GetNextMove(CheckersBoardGame game)
         {
-            ResetCounts();
-            //var possibleMoves = board.Board.GetAllAvailableMoves(Color);
-
-            //foreach (var move in possibleMoves)
-            //{
-            //    board.MovePiece(move.TypeOfMove, board.Board.GetPieceAtPosition(move.OriginalPieceLocation), move.FinalPieceLocation.X,
-            //                   move.FinalPieceLocation.Y);
-
-            //    return TurnResult.Finished;
-            //}
-            var maxDepth = 0;
-            var move = AlphaBeta(game.Board, ref maxDepth);
-            if (move != null)
+            if (_logicThread == null)
             {
-                var result = game.Board.MovePiece(move.TypeOfMove,
-                                     game.Board.GetPieceAtPosition(move.OriginalPieceLocation.X,
-                                                                   move.OriginalPieceLocation.Y),
-                                     move.FinalPieceLocation.X, move.FinalPieceLocation.Y);
+                _finalResult = TurnResult.NotDone;
+                _logicThread = new Thread(() =>
+                                              {
+                                                  ResetCounts();
 
-                return result;
+                                                  var maxDepth = 0;
+                                                  var move = AlphaBeta(game.Board, ref maxDepth);
+                                                  if (move != null)
+                                                  {
+                                                      var result = game.Board.MovePiece(move.TypeOfMove,
+                                                                                        game.Board.GetPieceAtPosition(
+                                                                                            move.OriginalPieceLocation.X,
+                                                                                            move.OriginalPieceLocation.Y),
+                                                                                        move.FinalPieceLocation.X,
+                                                                                        move.FinalPieceLocation.Y);
+
+                                                      _finalResult = result;
+                                                  }
+                                              });
+                _logicThread.Start();
+            }
+            else
+            {
+                if(!_logicThread.IsAlive)
+                {
+                    _logicThread.Join();
+                    _logicThread = null;
+                }
             }
 
-            return TurnResult.NotDone;
+            return _finalResult;
         }
 
         public MoveResult AlphaBeta(CheckersBoard game, ref int maxDepth)
@@ -104,6 +121,7 @@ namespace CS6613_Final
 
                 return retVal;
             }
+
 
             foreach(var m in moves)
             {

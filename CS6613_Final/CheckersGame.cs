@@ -81,7 +81,7 @@ namespace CS6613_Final
             _cgame = new CheckersBoardGame();
 
             LogicDriver pOne = new PlayerLogicDriver(this);
-            LogicDriver pTwo = new ComputerLogicDriver();
+            LogicDriver pTwo = new PlayerLogicDriver(this);
 
             bool playerWantsToGoFirst = false;
 
