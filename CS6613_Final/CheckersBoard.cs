@@ -52,6 +52,11 @@ namespace CS6613_Final
             return InPlayPieces.SingleOrDefault(c => c.X == loc.X && c.Y == loc.Y);
         }
 
+        public IEnumerable<CheckersPiece> GetPiecesForColor(PieceColor c)
+        {
+            return InPlayPieces.Where(cp => cp.Color == c);
+        }
+
         public IEnumerable<Location> LocationsBetweenDiagonals(Location one, Location two)
         {
             var locs = new List<Location>();

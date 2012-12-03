@@ -20,10 +20,10 @@ namespace CS6613_Final
 
     internal class ComputerLogicDriver : LogicDriver
     {
-        public const int NegativeInfinity = -1000;
-        public const int PositiveInfinity =  1000;
+        public const int NegativeInfinity = -500;
+        public const int PositiveInfinity =  500;
 
-        private Thread _logicThread = null;
+        private Thread _logicThread;
 
         public DateTime AlphaBetaStartTime { get; set; }
 
@@ -88,33 +88,34 @@ namespace CS6613_Final
 
         public MoveResult AlphaBeta(CheckersBoard game, ref int maxDepth)
         {
-            var alpha = NegativeInfinity;
-            var beta = PositiveInfinity;
+            const int alpha = NegativeInfinity;
+            const int beta = PositiveInfinity;
             maxDepth = 0;
             var currentDepth = 0;
-            var v = MaxValue(game, ref alpha, ref beta, Color, ref currentDepth, ref maxDepth);
-            Console.WriteLine("Optimal move found with depth {0}; max depth searched was {1}.", v.Depth, maxDepth);
+            var v = MaxValue(game, alpha, beta, Color, ref currentDepth, ref maxDepth);
+            Console.WriteLine("Optimal move found with depth {0}; max depth searched was {1}; time to find move: {2}; [{3}, {4}]", v.Depth, maxDepth, DateTime.Now - AlphaBetaStartTime, alpha, beta);
 
             return v.Move;
         }
 
-        public AlphaBetaReturnValue MaxValue(CheckersBoard board, ref int alphaValue, ref int betaValue, PieceColor color, ref int currentDepth, ref int maxDepth)
+        public AlphaBetaReturnValue MaxValue(CheckersBoard board, int alphaValue, int betaValue, PieceColor color, ref int currentDepth, ref int maxDepth)
         {
             NodesGenerated++;
             if (NodesGenerated % 10000 == 0)
-                Console.WriteLine("NodesGenerated: {0}, Max Prunes: {1}, Min Prunes: {2}, Total Time: {3}",
+                Console.WriteLine("NodesGenerated: {0}, Max Prunes: {1}, Min Prunes: {2}, Total Time: {3}, [{4}, {5}]",
                                   NodesGenerated, NumberOfMaxPrunes, NumberOfMinPrunes,
-                                  DateTime.Now - AlphaBetaStartTime);
+                                  DateTime.Now - AlphaBetaStartTime, alphaValue, betaValue);
 
-            var result = board.GetGameResultState(color);
+            //var result = board.GetGameResultState(color);
             
             var v = NegativeInfinity;
             var retVal = new AlphaBetaReturnValue(v, null, currentDepth + 1);
-            var moves = board.GetAllAvailableMoves(color).ToList();
+            var moves = board.GetAllAvailableMoves(color).OrderByDescending(mr => mr.JumpResults.Count()).ToList();
+            var numJumps = moves.Count(mr => mr.Type == MoveType.Jump) >= 2;
 
-            if (AmIWinner(result) || !moves.Any())
+            if (CutoffTest(board, currentDepth) || !moves.Any())
             {
-                retVal.Value = Utility(result);
+                retVal.Value = Evaluate(board);
                 retVal.Depth = currentDepth;
 
                 return retVal;
@@ -125,22 +126,22 @@ namespace CS6613_Final
             {
                 var resultingBoard = board.Clone();
 
-                var moveResult = resultingBoard.MovePiece(m,
-                                                          resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
-                                                                                            m.OriginalPieceLocation.Y));
+                resultingBoard.MovePiece(m,
+                                         resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
+                                                                           m.OriginalPieceLocation.Y));
 
-                //if (moves.Count == 1)
-                //{
-                //    retVal.Move = m;
-                //    retVal.Value = Utility(result);
+                if (currentDepth == 0 && moves.Count == 1)
+                {
+                    retVal.Move = m;
+                    retVal.Value = Evaluate(board);
 
-                //    return retVal;
-                //}
+                    return retVal;
+                }
 
                 var newDepth = currentDepth;
 
                 newDepth++; 
-                retVal = MinValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
+                retVal = MinValue(resultingBoard, alphaValue, betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
               
                 retVal.Move = m;
                 
@@ -164,45 +165,48 @@ namespace CS6613_Final
             return retVal;
         }
 
-        public AlphaBetaReturnValue MinValue(CheckersBoard board, ref int alphaValue, ref int betaValue, PieceColor color, ref int currentDepth, ref int maxDepth)
+        public AlphaBetaReturnValue MinValue(CheckersBoard board, int alphaValue, int betaValue, PieceColor color, ref int currentDepth, ref int maxDepth)
         {
             NodesGenerated++;
             if (NodesGenerated % 10000 == 0)
-                Console.WriteLine("NodesGenerated: {0}, Max Prunes: {1}, Min Prunes: {2}, Total Time: {3}", NodesGenerated, NumberOfMaxPrunes, NumberOfMinPrunes, DateTime.Now - AlphaBetaStartTime);
+                Console.WriteLine("NodesGenerated: {0}, Max Prunes: {1}, Min Prunes: {2}, Total Time: {3}, [{4}, {5}]",
+                                  NodesGenerated, NumberOfMaxPrunes, NumberOfMinPrunes,
+                                  DateTime.Now - AlphaBetaStartTime, alphaValue, betaValue);
 
-            var result = board.GetGameResultState(color);
+            //var result = board.GetGameResultState(color);
 
             var v = PositiveInfinity;
             var retVal = new AlphaBetaReturnValue(v, null, currentDepth+1);
-            var moves = board.GetAllAvailableMoves(color).ToList();
+            var moves = board.GetAllAvailableMoves(color).OrderByDescending(mr => mr.JumpResults.Count()).ToList();
+            var numJumps = moves.Count(mr => mr.Type == MoveType.Jump) >= 2;
 
-            if (AmIWinner(result) || !moves.Any())
+            if (CutoffTest(board, currentDepth) || !moves.Any())
             {
-                retVal.Value = Utility(result);
+                retVal.Value = Evaluate(board);
                 retVal.Depth = currentDepth;
 
                 return retVal;
             }
-            
+
             foreach (var m in moves)
             {
                 var resultingBoard = board.Clone();
-                var moveResult = resultingBoard.MovePiece(m,
-                                            resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
-                                                                              m.OriginalPieceLocation.Y));
-                
-                //if(moves.Count == 1)
-                //{
-                //    retVal.Move = m;
-                //    retVal.Value = Utility(result);
+                resultingBoard.MovePiece(m,
+                                         resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
+                                                                           m.OriginalPieceLocation.Y));
 
-                //    return retVal;
-                //}
+                if(currentDepth == 0 && moves.Count == 1)
+                {
+                    retVal.Move = m;
+                    retVal.Value = Evaluate(board);
+
+                    return retVal;
+                }
 
                 var newDepth = currentDepth;
 
                 newDepth++;
-                retVal = MaxValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
+                retVal = MaxValue(resultingBoard, alphaValue, betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
                 
                 retVal.Move = m;
 
@@ -226,28 +230,34 @@ namespace CS6613_Final
             return retVal;
         }
 
-        public int Utility(GameResult result)
+        public int Evaluate(CheckersBoard state)
         {
-            if(Color == PieceColor.Black)
-            {
-                if (result == GameResult.BlackWins)
-                    return 1;
-                else if (result == GameResult.RedWins)
-                    return -1;
-            }
-            else if(Color == PieceColor.Red)
-            {
-                if(result == GameResult.RedWins)
-                    return 1;
-                else if (result == GameResult.BlackWins)
-                    return -1;
-            }
+            var pieces = state.InPlayPieces;
+            const int basePieceValue = 5;
+            
+            var ourTotalPieceValue = 0;
+            var theirTotalPieceValue = 0;
 
-            return -1;
+            foreach (var piece in pieces)
+            {
+                var pieceRow = (int)(state.TileBoard.Height * 0.5 - Math.Abs(state.TileBoard.Height * 0.5 - piece.Y));
+                var pieceValue = basePieceValue + pieceRow;
+
+                if (piece.Color == Color)
+                    ourTotalPieceValue += pieceValue;
+                else
+                    theirTotalPieceValue += pieceValue;
+            }
+            
+            return ourTotalPieceValue - theirTotalPieceValue;
         }
 
-        public bool AmIWinner(GameResult result)
+        public bool CutoffTest(CheckersBoard state, int depth)
         {
+            if (depth == 12)
+                return true;
+
+            var result = state.GetGameResultState(Color);
             if (Color == PieceColor.Black)
                 return result == GameResult.BlackWins;
             if (Color == PieceColor.Red)
