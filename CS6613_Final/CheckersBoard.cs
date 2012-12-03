@@ -189,12 +189,12 @@ namespace CS6613_Final
 
             foreach (var piece in InPlayPieces.Where(cp => cp.Color == color))
             {
-                availables.AddRange(GetAvailableMoves(piece, availables.Any(mr => mr.TypeOfMove == MoveType.Jump)));
+                availables.AddRange(GetAvailableMoves(piece, availables.Any(mr => mr.Type == MoveType.Jump)));
             }
 
             // if there are any jumps, you must take a jump
-            if (availables.Any(m => m.TypeOfMove == MoveType.Jump))
-                availables.RemoveAll(m => m.TypeOfMove != MoveType.Jump);
+            if (availables.Any(m => m.Type == MoveType.Jump))
+                availables.RemoveAll(m => m.Type != MoveType.Jump);
 
             return availables;
         }
@@ -207,12 +207,12 @@ namespace CS6613_Final
             var isMovePossible = true;
             foreach(var possibleMove in possibleMoves)
             {
-                if (possibleMove.TypeOfMove == MoveType.Forward)
+                if (possibleMove.Type == MoveType.Forward)
                 {
                     if (possibleMove.FinalPieceLocation.X == nx && possibleMove.FinalPieceLocation.Y == ny)
                         return MoveType.Forward;
                 }
-                else if(possibleMove.TypeOfMove == MoveType.Jump)
+                else if(possibleMove.Type == MoveType.Jump)
                 {
                     if (possibleMove.JumpResults.Any(jr => jr.FinalLocation.X == nx && jr.FinalLocation.Y == ny))
                         return MoveType.Jump;
@@ -277,6 +277,24 @@ namespace CS6613_Final
                 if (GetAvailableJumps(piece.X, piece.Y, piece.Color).Any())
                 {
                     return TurnResult.NotDone;
+                }
+            }
+
+            return TurnResult.Finished;
+        }
+
+        public TurnResult MovePiece(MoveResult move, CheckersPiece piece)
+        {
+            var oldX = piece.X;
+            var oldY = piece.Y;
+            piece.X = move.FinalPieceLocation.X;
+            piece.Y = move.FinalPieceLocation.Y;
+
+            if (move.Type == MoveType.Jump)
+            {
+                foreach (var jumpResult in move.JumpResults)
+                {
+                    GetPieceAtPosition(jumpResult.JumpedLocation).InPlay = false;
                 }
             }
 

@@ -64,12 +64,10 @@ namespace CS6613_Final
                                                   var move = AlphaBeta(game.Board, ref maxDepth);
                                                   if (move != null)
                                                   {
-                                                      var result = game.Board.MovePiece(move.TypeOfMove,
+                                                      var result = game.Board.MovePiece(move,
                                                                                         game.Board.GetPieceAtPosition(
                                                                                             move.OriginalPieceLocation.X,
-                                                                                            move.OriginalPieceLocation.Y),
-                                                                                        move.FinalPieceLocation.X,
-                                                                                        move.FinalPieceLocation.Y);
+                                                                                            move.OriginalPieceLocation.Y));
 
                                                       _finalResult = result;
                                                   }
@@ -126,23 +124,23 @@ namespace CS6613_Final
             foreach(var m in moves)
             {
                 var resultingBoard = board.Clone();
-                
-                var moveResult = resultingBoard.MovePiece(m.TypeOfMove,
-                                            resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
-                                                                              m.OriginalPieceLocation.Y),
-                                            m.FinalPieceLocation.X, m.FinalPieceLocation.Y);
+
+                var moveResult = resultingBoard.MovePiece(m,
+                                                          resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
+                                                                                            m.OriginalPieceLocation.Y));
+
+                //if (moves.Count == 1)
+                //{
+                //    retVal.Move = m;
+                //    retVal.Value = Utility(result);
+
+                //    return retVal;
+                //}
 
                 var newDepth = currentDepth;
 
-                if(moveResult == TurnResult.NotDone)
-                {
-                    retVal = MaxValue(resultingBoard, ref alphaValue, ref betaValue, color, ref newDepth, ref maxDepth);
-                }
-                else if(moveResult == TurnResult.Finished)
-                {
-                    newDepth++; 
-                    retVal = MinValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
-                }
+                newDepth++; 
+                retVal = MinValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
               
                 retVal.Move = m;
                 
@@ -189,21 +187,22 @@ namespace CS6613_Final
             foreach (var m in moves)
             {
                 var resultingBoard = board.Clone();
-                var moveResult = resultingBoard.MovePiece(m.TypeOfMove,
+                var moveResult = resultingBoard.MovePiece(m,
                                             resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
-                                                                              m.OriginalPieceLocation.Y),
-                                            m.FinalPieceLocation.X, m.FinalPieceLocation.Y);
+                                                                              m.OriginalPieceLocation.Y));
                 
+                //if(moves.Count == 1)
+                //{
+                //    retVal.Move = m;
+                //    retVal.Value = Utility(result);
+
+                //    return retVal;
+                //}
+
                 var newDepth = currentDepth;
-                if(moveResult == TurnResult.NotDone)
-                {
-                    retVal = MinValue(resultingBoard, ref alphaValue, ref betaValue, color, ref newDepth, ref maxDepth);
-                }
-                else if(moveResult == TurnResult.Finished)
-                {
-                    newDepth++;
-                    retVal = MaxValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
-                }
+
+                newDepth++;
+                retVal = MaxValue(resultingBoard, ref alphaValue, ref betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
                 
                 retVal.Move = m;
 
@@ -231,13 +230,17 @@ namespace CS6613_Final
         {
             if(Color == PieceColor.Black)
             {
-                if(result == GameResult.BlackWins)
+                if (result == GameResult.BlackWins)
                     return 1;
+                else if (result == GameResult.RedWins)
+                    return -1;
             }
             else if(Color == PieceColor.Red)
             {
                 if(result == GameResult.RedWins)
                     return 1;
+                else if (result == GameResult.BlackWins)
+                    return -1;
             }
 
             return -1;

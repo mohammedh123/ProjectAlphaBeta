@@ -32,7 +32,7 @@ namespace CS6613_Final
 
             foreach (var move in possibleMoves)
                 Console.WriteLine("Possible moves: {0} {1}", move.ToString(),
-                                  move.TypeOfMove == MoveType.Jump
+                                  move.Type == MoveType.Jump
                                       ? String.Format(" over {0}", String.Join(", ", move.JumpResults.Select(jr => jr.JumpedLocation)))
                                       : "");
         }
@@ -103,7 +103,7 @@ namespace CS6613_Final
                                 //if there are, and the move isn't a jump, then it is not valid
 
                                 var anyJumpPossible =
-                                    game.Board.GetAllAvailableMoves(Color).Any(m => m.TypeOfMove == MoveType.Jump);
+                                    game.Board.GetAllAvailableMoves(Color).Any(m => m.Type == MoveType.Jump);
                                 
                                 if ((anyJumpPossible && returnVal == MoveType.Jump) || (!anyJumpPossible && returnVal != MoveType.None))
                                 {

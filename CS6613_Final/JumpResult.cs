@@ -1,3 +1,5 @@
+using System;
+
 namespace CS6613_Final
 {
     public struct JumpResult
@@ -9,6 +11,11 @@ namespace CS6613_Final
         {
             JumpedLocation = jumpedLoc;
             FinalLocation = finalLoc;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{0}, jumped over {1}.", FinalLocation, JumpedLocation);
         }
     }
 }

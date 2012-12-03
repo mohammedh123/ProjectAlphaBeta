@@ -7,14 +7,14 @@ namespace CS6613_Final
 {
     internal class MoveResult
     {
-        public MoveType TypeOfMove { get; set; }
+        public MoveType Type { get; set; }
         public IEnumerable<JumpResult> JumpResults { get; set; } 
         public Location OriginalPieceLocation { get; set; }
         public Location FinalPieceLocation { get; set; }
 
         public MoveResult(MoveType type, CheckersPiece piece, int nx, int ny)
         {
-            TypeOfMove = type;
+            Type = type;
             OriginalPieceLocation = new Location(piece.X, piece.Y);
             FinalPieceLocation = new Location(nx, ny);
 
@@ -23,7 +23,7 @@ namespace CS6613_Final
 
         public override string ToString()
         {
-            return String.Format("{0} to {1}, Type: {2}", OriginalPieceLocation, FinalPieceLocation, TypeOfMove);
+            return String.Format("{0} to {1}, Type: {2}", OriginalPieceLocation, FinalPieceLocation, Type);
         }
     }
 }
