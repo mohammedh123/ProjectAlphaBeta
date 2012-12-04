@@ -88,10 +88,15 @@ namespace CS6613_Final
                         try
                         {
                             var clickedPiece = game.Board.GetPieceAtPosition(ix, iy);
+                            var appropriateMove =
+                                possibleMoves.FirstOrDefault(mr => mr.FinalPieceLocation.X == ix && mr.FinalPieceLocation.Y == iy);
+
+                            //TODO: FORCE USER TO TAKE A JUMP
+                            //TODO: FIGURE IT OUT
 
                             if (clickedPiece != null && clickedPiece.Color == Color)
                                 SetSelectedPiece(game, clickedPiece);
-                            else if (game.Board.TileBoard.IsValidLocation(ix, iy))
+                            else if (appropriateMove != null)
                             {
                                 //user potentially clicked a new space for the CurrentSelectedPiece
                                 var returnVal = game.Board.IsMovePossible(CurrentSelectedPiece, ix, iy, possibleMoves);
