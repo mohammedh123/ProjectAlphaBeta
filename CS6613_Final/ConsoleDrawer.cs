@@ -11,7 +11,5 @@ namespace CS6613_Final
 
             //if you want to write to console, fill the rest of this function out
         }
-
-        //no concept of a ghost piece [from dragging the tile] on the console, do not implement this
     }
 }

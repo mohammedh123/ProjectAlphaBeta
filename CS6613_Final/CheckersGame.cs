@@ -37,9 +37,6 @@ namespace CS6613_Final
             Content.RootDirectory = "Content";
         }
 
-        public Vector2 GhostSelectedPosition { get; set; }
-        public Location InitialMouseClick { get; set; }
-
         private int BoardWidthInPixels
         {
             get { return _cgame.Board.TileBoard.Width*TileSize; }
@@ -49,17 +46,7 @@ namespace CS6613_Final
         {
             get { return _cgame.Board.TileBoard.Height*TileSize; }
         }
-
-        public bool ShouldDrawGhostPiece
-        {
-            get
-            {
-                return CurrentGameState == GameState.MovingPiece &&
-                       Mouse.GetState().LeftButton == ButtonState.Pressed &&
-                       (Mouse.GetState().X != InitialMouseClick.X || Mouse.GetState().Y != InitialMouseClick.Y);
-            }
-        }
-
+        
         public bool IsWithinBoard(int x, int y)
         {
             var rect = new Rectangle(0, 0, BoardWidthInPixels, BoardHeightInPixels);

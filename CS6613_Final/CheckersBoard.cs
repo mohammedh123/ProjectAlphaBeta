@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace CS6613_Final
 {
     internal class CheckersBoard
     {
+        private int _internalTurnBookKeeping = 0;
+
         public Board TileBoard { get; set; }
         public List<CheckersPiece> PlayerOnePieces { get; set; }
         public List<CheckersPiece> PlayerTwoPieces { get; set; }
@@ -52,9 +55,19 @@ namespace CS6613_Final
             return InPlayPieces.SingleOrDefault(c => c.X == loc.X && c.Y == loc.Y);
         }
 
+        public CheckersPiece GetCapturedPieceAtPositionForColor(Location loc, PieceColor col)
+        {
+            return CapturedPieces.Where(c => c.X == loc.X && c.Y == loc.Y && c.Color == col).OrderByDescending(cp => cp.Timestamp).FirstOrDefault();
+        }
+
         public IEnumerable<CheckersPiece> GetPiecesForColor(PieceColor c)
         {
             return InPlayPieces.Where(cp => cp.Color == c);
+        }
+
+        public CheckersPiece GetPieceForColorAtLocation(Location loc, PieceColor col)
+        {
+            return InPlayPieces.SingleOrDefault(c => c.X == loc.X && c.Y == loc.Y && c.Color == col);
         }
 
         public IEnumerable<Location> LocationsBetweenDiagonals(Location one, Location two)
@@ -288,10 +301,14 @@ namespace CS6613_Final
             return TurnResult.Finished;
         }
 
-        public TurnResult MovePiece(MoveResult move, CheckersPiece piece)
+        public TurnResult MovePiece(MoveResult move, PieceColor color)
         {
-            var oldX = piece.X;
-            var oldY = piece.Y;
+            var piece =
+                GetPiecesForColor(color).SingleOrDefault(
+                    p => p.X == move.OriginalPieceLocation.X && p.Y == move.OriginalPieceLocation.Y);
+
+            Debug.Assert(piece != null);
+
             piece.X = move.FinalPieceLocation.X;
             piece.Y = move.FinalPieceLocation.Y;
 
@@ -299,11 +316,45 @@ namespace CS6613_Final
             {
                 foreach (var jumpResult in move.JumpResults)
                 {
-                    GetPieceAtPosition(jumpResult.JumpedLocation).InPlay = false;
+                    var killedPiece = GetPieceForColorAtLocation(jumpResult.JumpedLocation, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black);
+
+                    killedPiece.InPlay = false;
+                    killedPiece.Timestamp = _internalTurnBookKeeping;
                 }
             }
 
+            _internalTurnBookKeeping++;
             return TurnResult.Finished;
+        }
+
+        public void RevertMove(MoveResult move, PieceColor color)
+        {
+            if(move.Type == MoveType.Jump)
+            {
+                foreach(var jumpResult in move.JumpResults)
+                {
+                    var resPiece = GetCapturedPieceAtPositionForColor(jumpResult.JumpedLocation,
+                                                                      color == PieceColor.Black
+                                                                          ? PieceColor.Red
+                                                                          : PieceColor.Black);
+                    resPiece.InPlay = true;
+                    resPiece.Timestamp = 0;
+                }
+            }
+
+            var piece = GetPieceAtPosition(move.FinalPieceLocation);
+            piece.X = move.OriginalPieceLocation.X;
+            piece.Y = move.OriginalPieceLocation.Y;
+
+            _internalTurnBookKeeping--;
+        }
+
+        public bool ArePiecesInSamePosition(CheckersBoard board)
+        {
+            return InPlayPieces.Count() == board.InPlayPieces.Count() &&
+                   CapturedPieces.Count() == board.CapturedPieces.Count() &&
+                   InPlayPieces.All(cp => board.InPlayPieces.SingleOrDefault(cp2 => cp2.Equals(cp)) != null) &&
+                   CapturedPieces.All(cp => board.CapturedPieces.SingleOrDefault(cp2 => cp2.Equals(cp)) != null);
         }
     }
 }

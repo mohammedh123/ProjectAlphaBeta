@@ -51,17 +51,6 @@ namespace CS6613_Final
                 _spriteBatch.Draw(pieceTexture, new Rectangle(piece.X*TileSize, piece.Y*TileSize, TileSize, TileSize),
                                  Color.White);
             }
-
-            if (_checkersGame.ShouldDrawGhostPiece)
-                DrawGhostPiece(board, selectedPiece, InputManager.GetLocationFromMouse());
-        }
-
-        protected override void DrawGhostPiece(Board board, CheckersPiece ghostPiece, Location pixelCoords)
-        {
-            Texture2D pieceTexture = ghostPiece.Color == PieceColor.Black ? _blackPiece : _redPiece;
-
-            _spriteBatch.Draw(pieceTexture, new Vector2(pixelCoords.X, pixelCoords.Y), null, Color.White*0.5f, 0.0f,
-                             _tileCenter, 1.0f, SpriteEffects.None, 0);
         }
     }
 }

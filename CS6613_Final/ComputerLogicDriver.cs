@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -20,6 +21,7 @@ namespace CS6613_Final
 
     internal class ComputerLogicDriver : LogicDriver
     {
+        public const int MaxDepth = 16;
         public const int NegativeInfinity = -500;
         public const int PositiveInfinity =  500;
 
@@ -64,10 +66,7 @@ namespace CS6613_Final
                                                   var move = AlphaBeta(game.Board, ref maxDepth);
                                                   if (move != null)
                                                   {
-                                                      var result = game.Board.MovePiece(move,
-                                                                                        game.Board.GetPieceAtPosition(
-                                                                                            move.OriginalPieceLocation.X,
-                                                                                            move.OriginalPieceLocation.Y));
+                                                      var result = game.Board.MovePiece(move, Color);
 
                                                       _finalResult = result;
                                                   }
@@ -92,7 +91,8 @@ namespace CS6613_Final
             const int beta = PositiveInfinity;
             maxDepth = 0;
             var currentDepth = 0;
-            var v = MaxValue(game, alpha, beta, Color, ref currentDepth, ref maxDepth);
+            var copy = game.Clone();
+            var v = MaxValue(copy, alpha, beta, Color, ref currentDepth, ref maxDepth);
             Console.WriteLine("Optimal move found with depth {0}; max depth searched was {1}; time to find move: {2}; [{3}, {4}]", v.Depth, maxDepth, DateTime.Now - AlphaBetaStartTime, alpha, beta);
 
             return v.Move;
@@ -111,7 +111,7 @@ namespace CS6613_Final
             var v = NegativeInfinity;
             var retVal = new AlphaBetaReturnValue(v, null, currentDepth + 1);
             var moves = board.GetAllAvailableMoves(color).OrderByDescending(mr => mr.JumpResults.Count()).ToList();
-            var numJumps = moves.Count(mr => mr.Type == MoveType.Jump) >= 2;
+            //var numJumps = moves.Count(mr => mr.Type == MoveType.Jump) >= 2;
 
             if (CutoffTest(board, currentDepth) || !moves.Any())
             {
@@ -120,30 +120,27 @@ namespace CS6613_Final
 
                 return retVal;
             }
-
-
+            
             foreach(var m in moves)
             {
-                var resultingBoard = board.Clone();
-
-                resultingBoard.MovePiece(m,
-                                         resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
-                                                                           m.OriginalPieceLocation.Y));
+                board.MovePiece(m, color);
 
                 if (currentDepth == 0 && moves.Count == 1)
                 {
                     retVal.Move = m;
                     retVal.Value = Evaluate(board);
 
+                    board.RevertMove(m, color);
                     return retVal;
                 }
 
                 var newDepth = currentDepth;
 
                 newDepth++; 
-                retVal = MinValue(resultingBoard, alphaValue, betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
-              
+                retVal = MinValue(board, alphaValue, betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
                 retVal.Move = m;
+
+                board.RevertMove(m, color);
                 
                 if (retVal.Depth > maxDepth)
                     maxDepth = retVal.Depth;
@@ -178,7 +175,7 @@ namespace CS6613_Final
             var v = PositiveInfinity;
             var retVal = new AlphaBetaReturnValue(v, null, currentDepth+1);
             var moves = board.GetAllAvailableMoves(color).OrderByDescending(mr => mr.JumpResults.Count()).ToList();
-            var numJumps = moves.Count(mr => mr.Type == MoveType.Jump) >= 2;
+            //var numJumps = moves.Count(mr => mr.Type == MoveType.Jump) >= 2;
 
             if (CutoffTest(board, currentDepth) || !moves.Any())
             {
@@ -187,28 +184,27 @@ namespace CS6613_Final
 
                 return retVal;
             }
-
+            
             foreach (var m in moves)
             {
-                var resultingBoard = board.Clone();
-                resultingBoard.MovePiece(m,
-                                         resultingBoard.GetPieceAtPosition(m.OriginalPieceLocation.X,
-                                                                           m.OriginalPieceLocation.Y));
+                board.MovePiece(m, color);
 
                 if(currentDepth == 0 && moves.Count == 1)
                 {
                     retVal.Move = m;
                     retVal.Value = Evaluate(board);
 
+                    board.RevertMove(m, color);
                     return retVal;
                 }
 
                 var newDepth = currentDepth;
 
                 newDepth++;
-                retVal = MaxValue(resultingBoard, alphaValue, betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
-                
+                retVal = MaxValue(board, alphaValue, betaValue, color == PieceColor.Black ? PieceColor.Red : PieceColor.Black, ref newDepth, ref maxDepth);
                 retVal.Move = m;
+
+                board.RevertMove(m, color);
 
                 if (retVal.Depth > maxDepth)
                     maxDepth = retVal.Depth;
@@ -232,29 +228,35 @@ namespace CS6613_Final
 
         public int Evaluate(CheckersBoard state)
         {
-            var pieces = state.InPlayPieces;
-            const int basePieceValue = 5;
-            
-            var ourTotalPieceValue = 0;
-            var theirTotalPieceValue = 0;
+            int pOne = 0, pTwo = 0;
 
-            foreach (var piece in pieces)
-            {
-                var pieceRow = (int)(state.TileBoard.Height * 0.5 - Math.Abs(state.TileBoard.Height * 0.5 - piece.Y));
-                var pieceValue = basePieceValue + pieceRow;
+            pOne += state.PlayerOnePieces.Count();
+            pTwo += state.PlayerTwoPieces.Count();
 
-                if (piece.Color == Color)
-                    ourTotalPieceValue += pieceValue;
-                else
-                    theirTotalPieceValue += pieceValue;
-            }
-            
-            return ourTotalPieceValue - theirTotalPieceValue;
+            return Color == PieceColor.Black ? pOne : pTwo;
+            //var pieces = state.InPlayPieces;
+            //const int basePieceValue = 5;
+
+            //var ourTotalPieceValue = 0;
+            //var theirTotalPieceValue = 0;
+
+            //foreach (var piece in pieces)
+            //{
+            //    var pieceRow = state.TileBoard.Height / 2 - Math.Abs(state.TileBoard.Height / 2 - piece.Y);
+            //    var pieceValue = basePieceValue + pieceRow;
+
+            //    if (piece.Color == Color)
+            //        ourTotalPieceValue += pieceValue;
+            //    else
+            //        theirTotalPieceValue += pieceValue;
+            //}
+
+            //return ourTotalPieceValue - theirTotalPieceValue;
         }
 
         public bool CutoffTest(CheckersBoard state, int depth)
         {
-            if (depth == 12)
+            if (depth == MaxDepth)
                 return true;
 
             var result = state.GetGameResultState(Color);

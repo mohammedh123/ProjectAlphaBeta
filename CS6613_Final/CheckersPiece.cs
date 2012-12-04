@@ -18,6 +18,7 @@ namespace CS6613_Final
         public PieceColor Color { get; private set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public int Timestamp = 0;
 
         public PieceDirection Forward { get; private set; }
         
@@ -47,7 +48,7 @@ namespace CS6613_Final
 
         public override string ToString()
         {
-            return String.Format("[{0},{1}] : {2}", X, Y, Color);
+            return String.Format("[{0},{1}] : {2}, T: {3}", X, Y, Color, Timestamp);
         }
 
         public override int GetHashCode()

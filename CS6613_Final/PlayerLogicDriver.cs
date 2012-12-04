@@ -27,6 +27,7 @@ namespace CS6613_Final
 
         private void SetSelectedPiece(CheckersBoardGame game, CheckersPiece piece)
         {
+            _checkersGame.CurrentGameState = GameState.MovingPiece;
             CurrentSelectedPiece = piece;
             possibleMoves = game.Board.GetAvailableMoves(piece, false);
 
@@ -46,7 +47,7 @@ namespace CS6613_Final
 
             //let the player continue doing what hes doing until he makes a move
             // e.g. clicking a piece and then clicking a new place
-            if (_checkersGame.CurrentGameState == GameState.SelectingPiece)
+            if (_checkersGame.CurrentGameState == GameState.SelectingPiece || _checkersGame.CurrentGameState == GameState.MovingPiece)
             {
                 if (InputManager.LeftMouseClick())
                 {
@@ -61,9 +62,6 @@ namespace CS6613_Final
                         //see if piece is for the right player
                         if (piece != null && piece.Color == Color)
                         {
-                            _checkersGame.CurrentGameState = GameState.MovingPiece;
-                            _checkersGame.InitialMouseClick = new Location(mx, my);
-
                             SetSelectedPiece(game, piece);
                         }
                         else
@@ -75,18 +73,17 @@ namespace CS6613_Final
                     } //ignore a click on the board that isnt on a piece
                 }
             }
-            else if (_checkersGame.CurrentGameState == GameState.MovingPiece)
+            if (_checkersGame.CurrentGameState == GameState.MovingPiece)
             {
                 Debug.Assert(CurrentSelectedPiece != null);
 
                 int mx = Mouse.GetState().X, my = Mouse.GetState().Y;
-                _checkersGame.GhostSelectedPosition = new Vector2(mx, my);
                 int ix = mx/CheckersGame.TileSize, iy = my/CheckersGame.TileSize;
 
                 //user dragged it to a new slot
                 if (ix != CurrentSelectedPiece.X || iy != CurrentSelectedPiece.Y)
                 {
-                    if (InputManager.LeftMouseClick() || InputManager.LeftMouseReleased()) //user clicked a new slot
+                    if (InputManager.LeftMouseClick()) //user clicked a new slot
                     {
                         try
                         {
