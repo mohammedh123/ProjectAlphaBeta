@@ -234,24 +234,6 @@ namespace CS6613_Final
             pTwo += state.PlayerTwoPieces.Count();
 
             return Color == PieceColor.Black ? pOne : pTwo;
-            //var pieces = state.InPlayPieces;
-            //const int basePieceValue = 5;
-
-            //var ourTotalPieceValue = 0;
-            //var theirTotalPieceValue = 0;
-
-            //foreach (var piece in pieces)
-            //{
-            //    var pieceRow = state.TileBoard.Height / 2 - Math.Abs(state.TileBoard.Height / 2 - piece.Y);
-            //    var pieceValue = basePieceValue + pieceRow;
-
-            //    if (piece.Color == Color)
-            //        ourTotalPieceValue += pieceValue;
-            //    else
-            //        theirTotalPieceValue += pieceValue;
-            //}
-
-            //return ourTotalPieceValue - theirTotalPieceValue;
         }
 
         public bool CutoffTest(CheckersBoard state, int depth)
