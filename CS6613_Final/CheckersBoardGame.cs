@@ -180,7 +180,9 @@ namespace CS6613_Final
             var result = CurrentPlayer.GetNextMove(this);
 
             if (result == TurnResult.Finished)
+            {
                 SwitchPlayer();
+            }
         }
 
         public void SwitchPlayer()

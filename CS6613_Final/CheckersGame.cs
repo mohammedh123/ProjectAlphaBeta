@@ -11,7 +11,8 @@ namespace CS6613_Final
         PlayerQuery,
         SelectingPiece,
         MovingPiece,
-        WaitingForComputer
+        WaitingForComputer,
+        GameOver
     }
 
     /// <summary>
@@ -122,7 +123,14 @@ namespace CS6613_Final
                 if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
 
-                _cgame.AttemptTurn();
+                if (_cgame.Board.IsGameOver(_cgame.CurrentPlayer.Color))
+                {
+                    CurrentGameState = GameState.GameOver;
+                }
+                else
+                {
+                    _cgame.AttemptTurn();
+                }
 
                 InputManager.PostUpdate();
             }
