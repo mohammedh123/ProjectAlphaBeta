@@ -8,7 +8,7 @@ namespace CS6613_Final
     internal class MoveResult
     {
         public MoveType Type { get; set; }
-        public IEnumerable<JumpResult> JumpResults { get; set; } 
+        public List<JumpResult> JumpResults { get; set; } 
         public Location OriginalPieceLocation { get; set; }
         public Location FinalPieceLocation { get; set; }
 

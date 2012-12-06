@@ -77,8 +77,9 @@ namespace CS6613_Final
 
             g.Draw(CheckersGame.BlankTexture, newB, bg);
 
-            foreach (string s in stringsToDraw)
+            for (int i = 0; i < stringsToDraw.Count; i++)
             {
+                string s = stringsToDraw[i];
                 fontDimensions = f.MeasureString(s);
                 position = new Vector2(box.X + padding, position.Y);
                 if ((align & TextAlignment.Center) == TextAlignment.Center)

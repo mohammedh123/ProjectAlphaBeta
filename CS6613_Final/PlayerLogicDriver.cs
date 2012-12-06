@@ -11,7 +11,7 @@ namespace CS6613_Final
     internal class PlayerLogicDriver : LogicDriver
     {
         private readonly CheckersGame _checkersGame;
-        private IEnumerable<MoveResult> _allAvailableMoves = null, _selectedAvailableMoves = null; 
+        private List<MoveResult> _allAvailableMoves = null, _selectedAvailableMoves = null; 
 
         public PlayerLogicDriver(CheckersGame game)
         {
@@ -58,7 +58,7 @@ namespace CS6613_Final
                     if (_checkersGame.IsWithinBoard(mx, my))
                     {
                         //see if mouse clicked on a piece
-                        var piece = game.Board.GetPieceAtPosition(ix, iy);
+                        var piece = game.Board.Pieces.GetPieceAtPosition(ix, iy);
 
                         //see if piece is for the right player
                         if (piece != null && piece.Color == Color)
@@ -88,7 +88,7 @@ namespace CS6613_Final
                     {
                         try
                         {
-                            var clickedPiece = game.Board.GetPieceAtPosition(ix, iy);
+                            var clickedPiece = game.Board.Pieces.GetPieceAtPosition(ix, iy);
                             var appropriateMove =
                                 _selectedAvailableMoves.FirstOrDefault(mr => mr.FinalPieceLocation.X == ix && mr.FinalPieceLocation.Y == iy);
                             var anyJumpsAvailable = _allAvailableMoves.Any(mr => mr.Type == MoveType.Jump);

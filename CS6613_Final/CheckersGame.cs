@@ -66,35 +66,7 @@ namespace CS6613_Final
             BlankTexture = new Texture2D(GraphicsDevice, 1, 1);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _cgame = new CheckersBoardGame();
-
-            LogicDriver pOne = new PlayerLogicDriver(this);
-            LogicDriver pTwo = new ComputerLogicDriver();
-
-            bool playerWantsToGoFirst = false;
-
-            if (pOne.IsPlayer || pTwo.IsPlayer)
-            {
-                CurrentGameState = GameState.WaitingForComputer;
-                string whichLogicIsPlayer = pOne.IsPlayer ? "Player One" : "Player Two";
-
-                WinForms.DialogResult result =
-                    WinForms.MessageBox.Show(String.Format("Would you ({0}) like to go first?", whichLogicIsPlayer),
-                                             "Choice", WinForms.MessageBoxButtons.YesNo);
-
-                if (result == WinForms.DialogResult.Yes)
-                {
-                    playerWantsToGoFirst = true;
-
-                    CurrentGameState = GameState.SelectingPiece;
-                }
-            }
-
-            _cgame.Start(6, pOne,
-                        pTwo,
-                        new GuiDrawer(_spriteBatch, Content, this),
-                        //new ConsoleDrawer()
-                        playerWantsToGoFirst);
+            RestartGame();
 
             _graphics.PreferredBackBufferWidth = BoardWidthInPixels + SideSize;
             _graphics.PreferredBackBufferHeight = BoardHeightInPixels;
@@ -126,6 +98,23 @@ namespace CS6613_Final
                 if (_cgame.Board.IsGameOver(_cgame.CurrentPlayer.Color))
                 {
                     CurrentGameState = GameState.GameOver;
+
+                    var winningPlayerState = _cgame.Board.GetGameResultState(_cgame.CurrentPlayer.Color);
+                    var winningPlayer = winningPlayerState == GameResult.BlackWins ? "One (Black)" : "Two (Red)";
+
+                    var dialogResult = WinForms.MessageBox.Show(
+                        String.Format("Player {0} has won. Would you like to play again?", winningPlayer), "Game Over",
+                        WinForms.MessageBoxButtons.YesNo, WinForms.MessageBoxIcon.Question,
+                        WinForms.MessageBoxDefaultButton.Button1);
+
+                    if(dialogResult == WinForms.DialogResult.Yes)
+                    {
+                        RestartGame();
+                    }
+                    else if(dialogResult == WinForms.DialogResult.No)
+                    {
+                        Exit();
+                    }
                 }
                 else
                 {
@@ -136,6 +125,38 @@ namespace CS6613_Final
             }
 
             base.Update(gameTime);
+        }
+
+        private void RestartGame()
+        {
+            _cgame = new CheckersBoardGame();
+
+            LogicDriver pOne = new PlayerLogicDriver(this);
+            LogicDriver pTwo = new ComputerLogicDriver();
+
+            bool playerWantsToGoFirst = false;
+
+            if (pOne.IsPlayer || pTwo.IsPlayer)
+            {
+                CurrentGameState = GameState.WaitingForComputer;
+                var whichLogicIsPlayer = pOne.IsPlayer ? "Player One" : "Player Two";
+
+                var result =
+                    WinForms.MessageBox.Show(String.Format("Would you ({0}) like to go first?", whichLogicIsPlayer),
+                                             "Choice", WinForms.MessageBoxButtons.YesNo);
+
+                if (result == WinForms.DialogResult.Yes)
+                {
+                    playerWantsToGoFirst = true;
+
+                    CurrentGameState = GameState.SelectingPiece;
+                }
+            }
+
+            _cgame.Start(6, pOne,
+                        pTwo,
+                        new GuiDrawer(_spriteBatch, Content, this),
+                        playerWantsToGoFirst);
         }
 
         /// <summary>

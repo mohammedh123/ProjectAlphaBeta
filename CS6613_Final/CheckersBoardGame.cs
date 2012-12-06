@@ -84,8 +84,7 @@ namespace CS6613_Final
             Board = new CheckersBoard
                         {
                             TileBoard = new Board(6, 6),
-                            PlayerOnePieces = new List<CheckersPiece>(),
-                            PlayerTwoPieces = new List<CheckersPiece>()
+                            Pieces = new SetOfPieces()
                         };
 
             var pOneColor = -1;// r.Next(0, 2); // 0 = black, 1 = red
@@ -106,73 +105,49 @@ namespace CS6613_Final
                 pOneColor = 1;
             }
 
-            bool specificCase = false;
-
             _playerOne = pOne;
             _playerOne.Color = pOneColor == 0 ? PieceColor.Black : PieceColor.Red;
 
-            if (!specificCase)
+            for (int j = 0; j < Board.TileBoard.Height; j++)
             {
-                for (int j = 0; j < Board.TileBoard.Height; j++)
+                for (int i = 0; i < Board.TileBoard.Width; i++)
                 {
-                    for (int i = 0; i < Board.TileBoard.Width; i++)
-                    {
-                        if (Board.TileBoard.GetTile(i, j).Color == TileColor.Black)
-                            Board.PlayerOnePieces.Add(new CheckersPiece(i, j, PieceColor.Black, PieceDirection.Down));
+                    if (Board.TileBoard.GetTile(i, j).Color == TileColor.Black)
+                        Board.Pieces.AddPiece(PieceColor.Black, i, j, PieceDirection.Down);
 
-                        if (Board.PlayerOnePieces.Count == numPieces)
-                            break;
-                    }
-
-                    if (Board.PlayerOnePieces.Count == numPieces)
+                    if (Board.Pieces.AlivePlayerOnePieces.Count == numPieces)
                         break;
                 }
 
-                _playerTwo = pTwo;
-                _playerTwo.Color = _playerOne.Color == PieceColor.Red ? PieceColor.Black : PieceColor.Red;
+                if (Board.Pieces.AlivePlayerOnePieces.Count == numPieces)
+                    break;
+            }
 
-                for (int j = Board.TileBoard.Height - 1; j >= 0; j--)
+            _playerTwo = pTwo;
+            _playerTwo.Color = _playerOne.Color == PieceColor.Red ? PieceColor.Black : PieceColor.Red;
+
+            for (int j = Board.TileBoard.Height - 1; j >= 0; j--)
+            {
+                for (int i = 0; i < Board.TileBoard.Width; i++)
                 {
-                    for (int i = 0; i < Board.TileBoard.Width; i++)
-                    {
-                        if (Board.TileBoard.GetTile(i, j).Color == TileColor.Black)
-                            Board.PlayerTwoPieces.Add(new CheckersPiece(i, j, PieceColor.Red, PieceDirection.Up));
+                    if (Board.TileBoard.GetTile(i, j).Color == TileColor.Black)
+                        Board.Pieces.AddPiece(PieceColor.Red, i, j, PieceDirection.Up);
 
-                        if (Board.PlayerTwoPieces.Count == numPieces)
-                            break;
-                    }
-
-                    if (Board.PlayerTwoPieces.Count == numPieces)
+                    if (Board.Pieces.AlivePlayerTwoPieces.Count == numPieces)
                         break;
                 }
+
+                if (Board.Pieces.AlivePlayerTwoPieces.Count == numPieces)
+                    break;
             }
-            else
-            {
-                _playerTwo = pTwo;
-                _playerTwo.Color = _playerOne.Color == PieceColor.Red ? PieceColor.Black : PieceColor.Red;
-
-                Board.PlayerOnePieces.Add(new CheckersPiece(0, 1, PieceColor.Red, PieceDirection.Down));
-                Board.PlayerOnePieces.Add(new CheckersPiece(0, 3, PieceColor.Red, PieceDirection.Down));
-                Board.PlayerOnePieces.Add(new CheckersPiece(2, 1, PieceColor.Red, PieceDirection.Down));
-                Board.PlayerOnePieces.Add(new CheckersPiece(2, 3, PieceColor.Red, PieceDirection.Down));
-                Board.PlayerOnePieces.Add(new CheckersPiece(4, 1, PieceColor.Red, PieceDirection.Down));
-                Board.PlayerOnePieces.Add(new CheckersPiece(4, 3, PieceColor.Red, PieceDirection.Down));
-
-                Board.PlayerTwoPieces.Add(new CheckersPiece(0, 5, PieceColor.Black, PieceDirection.Up));
-                Board.PlayerTwoPieces.Add(new CheckersPiece(2, 5, PieceColor.Black, PieceDirection.Up));
-                Board.PlayerTwoPieces.Add(new CheckersPiece(4, 5, PieceColor.Black, PieceDirection.Up));
-                Board.PlayerTwoPieces.Add(new CheckersPiece(1, 4, PieceColor.Black, PieceDirection.Up));
-                Board.PlayerTwoPieces.Add(new CheckersPiece(3, 4, PieceColor.Black, PieceDirection.Up));
-                Board.PlayerTwoPieces.Add(new CheckersPiece(5, 4, PieceColor.Black, PieceDirection.Up));
-            }
-
 
             _displayer = displayer;
         }
 
         public void Draw()
         {
-            _displayer.Draw(Board.TileBoard, Board.InPlayPieces, SelectedPiece);
+            _displayer.Draw(Board.TileBoard, Board.Pieces.AlivePlayerOnePieces, Board.Pieces.AlivePlayerTwoPieces,
+                            SelectedPiece);
         }
 
         public void AttemptTurn()
