@@ -163,8 +163,8 @@ namespace CS6613_Final
             ressedPiece.InPlay = true;
             ressedPiece.Timestamp = 0;
 
-            var listToKill = (ressedPiece.Color == PieceColor.Black ? AlivePlayerOnePieces : AlivePlayerTwoPieces);
-            var listToAdd = (ressedPiece.Color == PieceColor.Black ? CapturedPlayerOnePieces : CapturedPlayerTwoPieces);
+            var listToKill = (ressedPiece.Color == PieceColor.Black ? CapturedPlayerOnePieces : CapturedPlayerTwoPieces);
+            var listToAdd = (ressedPiece.Color == PieceColor.Black ? AlivePlayerOnePieces : AlivePlayerTwoPieces);
 
             for (int i = 0; i < listToKill.Count; i++)
             {

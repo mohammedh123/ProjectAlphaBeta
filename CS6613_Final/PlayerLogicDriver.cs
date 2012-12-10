@@ -30,7 +30,7 @@ namespace CS6613_Final
             _checkersGame.CurrentGameState = GameState.MovingPiece;
             CurrentSelectedPiece = piece;
             _allAvailableMoves = game.Board.GetAllAvailableMoves(Color);
-            _selectedAvailableMoves = game.Board.GetAvailableMoves(piece, false);
+            _selectedAvailableMoves = game.Board.GetAvailableMovesForPiece(piece, false);
 
             foreach (var move in _allAvailableMoves)
                 Console.WriteLine("Possible moves: {0} {1}", move.ToString(),

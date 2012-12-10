@@ -105,6 +105,9 @@ namespace CS6613_Final
                 pOneColor = 1;
             }
 
+            if (!pOne.IsPlayer && !pTwo.IsPlayer)
+                pOneColor = 0;
+
             _playerOne = pOne;
             _playerOne.Color = pOneColor == 0 ? PieceColor.Black : PieceColor.Red;
 

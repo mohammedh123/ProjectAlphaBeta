@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -95,30 +96,46 @@ namespace CS6613_Final
                 if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
 
-                if (_cgame.Board.IsGameOver(_cgame.CurrentPlayer.Color))
+                if (_cgame != null)
                 {
-                    CurrentGameState = GameState.GameOver;
-
-                    var winningPlayerState = _cgame.Board.GetGameResultState(_cgame.CurrentPlayer.Color);
-                    var winningPlayer = winningPlayerState == GameResult.BlackWins ? "One (Black)" : "Two (Red)";
-
-                    var dialogResult = WinForms.MessageBox.Show(
-                        String.Format("Player {0} has won. Would you like to play again?", winningPlayer), "Game Over",
-                        WinForms.MessageBoxButtons.YesNo, WinForms.MessageBoxIcon.Question,
-                        WinForms.MessageBoxDefaultButton.Button1);
-
-                    if(dialogResult == WinForms.DialogResult.Yes)
+                    if (_cgame.Board.IsGameOver(_cgame.CurrentPlayer.Color))
                     {
-                        RestartGame();
+                        Draw(gameTime);
+                        CurrentGameState = GameState.GameOver;
+
+                        var winningPlayerState = _cgame.Board.GetGameResultState(_cgame.CurrentPlayer.Color);
+                        var winningPlayer = winningPlayerState == GameResult.BlackWins ? "One (Black)" : "Two (Red)";
+
+                        var dialogThread = new Thread(() =>
+                                                          {
+                                                              var dialogResult = WinForms.MessageBox.Show(
+                                                                  String.Format(
+                                                                      "Player {0} has won. Would you like to play again?",
+                                                                      winningPlayer),
+                                                                  "Game Over",
+                                                                  WinForms.MessageBoxButtons.YesNo,
+                                                                  WinForms.MessageBoxIcon.Question,
+                                                                  WinForms.MessageBoxDefaultButton.Button1);
+
+                                                              if (dialogResult == WinForms.DialogResult.Yes)
+                                                              {
+                                                                  RestartGame();
+                                                              }
+                                                              else if (dialogResult == WinForms.DialogResult.No)
+                                                              {
+                                                                  Exit();
+                                                              }
+                                                          });
+
+                        //a quick hack to make sure that the graphics thread draws the final state
+                        //this only matters when the ai is computing a move, because it is computing a move in a different thread and might miss a draw call after finding one
+                        dialogThread.Start();
+                        dialogThread.Join(1);
                     }
-                    else if(dialogResult == WinForms.DialogResult.No)
+                    else
                     {
-                        Exit();
+                        _cgame.AttemptTurn();
                     }
-                }
-                else
-                {
-                    _cgame.AttemptTurn();
                 }
 
                 InputManager.PostUpdate();
@@ -129,30 +146,48 @@ namespace CS6613_Final
 
         private void RestartGame()
         {
-            _cgame = new CheckersBoardGame();
-
-            LogicDriver pOne = new PlayerLogicDriver(this);
-            LogicDriver pTwo = new ComputerLogicDriver();
-
+            Console.Clear();
+            _cgame = null;
+            LogicDriver pOne = null, pTwo = null;
             bool playerWantsToGoFirst = false;
 
-            if (pOne.IsPlayer || pTwo.IsPlayer)
-            {
-                CurrentGameState = GameState.WaitingForComputer;
-                var whichLogicIsPlayer = pOne.IsPlayer ? "Player One" : "Player Two";
+            var newForm = new SplashScreen();
+            newForm.ShowDialog();
+            var result = newForm.Result;
 
-                var result =
-                    WinForms.MessageBox.Show(String.Format("Would you ({0}) like to go first?", whichLogicIsPlayer),
+            if(result.TypeOfMatch == MatchType.PvP)
+            {
+                pOne = new PlayerLogicDriver(this);
+                pTwo = new PlayerLogicDriver(this);
+
+                CurrentGameState = GameState.SelectingPiece;
+            }
+            else if (result.TypeOfMatch == MatchType.PvC)
+            {
+                pOne = new PlayerLogicDriver(this);
+                pTwo = new ComputerLogicDriver(result.ComputerOneDifficulty);
+
+                CurrentGameState = GameState.WaitingForComputer;
+                var humanPlayerText = "Player One";
+
+                var goFirstResult =
+                    WinForms.MessageBox.Show(String.Format("Would you ({0}) like to go first?", humanPlayerText),
                                              "Choice", WinForms.MessageBoxButtons.YesNo);
 
-                if (result == WinForms.DialogResult.Yes)
+                if (goFirstResult == WinForms.DialogResult.Yes)
                 {
                     playerWantsToGoFirst = true;
 
                     CurrentGameState = GameState.SelectingPiece;
                 }
             }
+            else if (result.TypeOfMatch == MatchType.CvC)
+            {
+                pOne = new ComputerLogicDriver(result.ComputerOneDifficulty);
+                pTwo = new ComputerLogicDriver(result.ComputerTwoDifficulty);
+            }
 
+            _cgame = new CheckersBoardGame();
             _cgame.Start(6, pOne,
                         pTwo,
                         new GuiDrawer(_spriteBatch, Content, this),
@@ -166,39 +201,43 @@ namespace CS6613_Final
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkGray);
-            _spriteBatch.Begin();
+            if (_cgame != null)
+            {
+                _spriteBatch.Begin();
 
-            _cgame.Draw();
+                _cgame.Draw();
 
-            string finalStr = "";
-            finalStr += String.Format("It is {0}'s turn{1}.",
-                                      _cgame.CurrentPlayer.Color,
-                                      _cgame.CurrentPlayer.IsPlayer ? " (YOUR TURN)" : " (COMPUTER's TURN)");
+                string finalStr = "";
+                finalStr += String.Format("It is {0}'s turn{1}.",
+                                          _cgame.CurrentPlayer.Color,
+                                          _cgame.CurrentPlayer.IsPlayer ? " (YOUR TURN)" : " (COMPUTER's TURN)");
 
-            finalStr += Environment.NewLine + Environment.NewLine;
+                finalStr += Environment.NewLine + Environment.NewLine;
 
-            if (_cgame.SelectedPiece != null)
-                finalStr += String.Format("Selected: {0}",
-                                          _cgame.Board.TileBoard.GetNameForLocation(_cgame.SelectedPiece.X,
-                                                                                   _cgame.SelectedPiece.Y));
+                if (_cgame.SelectedPiece != null)
+                    finalStr += String.Format("Selected: {0}",
+                                              _cgame.Board.TileBoard.GetNameForLocation(_cgame.SelectedPiece.X,
+                                                                                        _cgame.SelectedPiece.Y));
 
-            finalStr += Environment.NewLine + Environment.NewLine;
-            finalStr += "Current state: " + CurrentGameState;
-            finalStr += Environment.NewLine + Environment.NewLine;
-            int mx = Mouse.GetState().X;
-            int my = Mouse.GetState().Y;
-            int ix = mx/TileSize, iy = my/TileSize;
-            finalStr += String.Format("({0},{1})", ix, iy);
+                finalStr += Environment.NewLine + Environment.NewLine;
+                finalStr += "Current state: " + CurrentGameState;
+                finalStr += Environment.NewLine + Environment.NewLine;
+                int mx = Mouse.GetState().X;
+                int my = Mouse.GetState().Y;
+                int ix = mx/TileSize, iy = my/TileSize;
+                finalStr += String.Format("({0},{1})", ix, iy);
 
-            Utility.DrawStringToFitBox(_spriteBatch,
-                                       _turnFont,
-                                       new Rectangle(BoardWidthInPixels, 0, SideSize, BoardHeightInPixels),
-                                       finalStr,
-                                       TextAlignment.Center, 0,
-                                       Color.White,
-                                       Color.Black);
+                Utility.DrawStringToFitBox(_spriteBatch,
+                                           _turnFont,
+                                           new Rectangle(BoardWidthInPixels, 0, SideSize, BoardHeightInPixels),
+                                           finalStr,
+                                           TextAlignment.Center, 0,
+                                           Color.White,
+                                           Color.Black);
 
-            _spriteBatch.End();
+                _spriteBatch.End();
+            }
+
             base.Draw(gameTime);
         }
     }
