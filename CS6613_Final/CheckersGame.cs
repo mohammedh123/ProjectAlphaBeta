@@ -100,7 +100,7 @@ namespace CS6613_Final
                 {
                     if (_cgame.Board.IsGameOver(_cgame.CurrentPlayer.Color))
                     {
-                        Draw(gameTime);
+                        //Draw(gameTime);
                         CurrentGameState = GameState.GameOver;
 
                         var winningPlayerState = _cgame.Board.GetGameResultState(_cgame.CurrentPlayer.Color);
@@ -207,25 +207,7 @@ namespace CS6613_Final
 
                 _cgame.Draw();
 
-                string finalStr = "";
-                finalStr += String.Format("It is {0}'s turn{1}.",
-                                          _cgame.CurrentPlayer.Color,
-                                          _cgame.CurrentPlayer.IsPlayer ? " (YOUR TURN)" : " (COMPUTER's TURN)");
-
-                finalStr += Environment.NewLine + Environment.NewLine;
-
-                if (_cgame.SelectedPiece != null)
-                    finalStr += String.Format("Selected: {0}",
-                                              _cgame.Board.TileBoard.GetNameForLocation(_cgame.SelectedPiece.X,
-                                                                                        _cgame.SelectedPiece.Y));
-
-                finalStr += Environment.NewLine + Environment.NewLine;
-                finalStr += "Current state: " + CurrentGameState;
-                finalStr += Environment.NewLine + Environment.NewLine;
-                int mx = Mouse.GetState().X;
-                int my = Mouse.GetState().Y;
-                int ix = mx/TileSize, iy = my/TileSize;
-                finalStr += String.Format("({0},{1})", ix, iy);
+                var finalStr = String.Format("{0}'s turn.", _cgame.CurrentPlayer.Color);
 
                 Utility.DrawStringToFitBox(_spriteBatch,
                                            _turnFont,

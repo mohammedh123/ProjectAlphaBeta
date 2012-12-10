@@ -12,7 +12,7 @@ namespace CS6613_Final
         private readonly ContentManager _contentManager;
         private readonly SpriteBatch _spriteBatch;
         private readonly Vector2 _tileCenter = new Vector2(TileSize*0.5f, TileSize*0.5f);
-        private Texture2D _blackPiece, _blackTile, _redPiece, _whiteTile;
+        private Texture2D _blackPiece, _blackTile, _redPiece, _whiteTile, _selectedGlow, _moveForward;
 
         public GuiDrawer(SpriteBatch sb, ContentManager content, CheckersGame game)
         {
@@ -29,6 +29,8 @@ namespace CS6613_Final
             _blackTile = _contentManager.Load<Texture2D>("blacktile");
             _redPiece = _contentManager.Load<Texture2D>("redpiece");
             _whiteTile = _contentManager.Load<Texture2D>("whitetile");
+            _selectedGlow = _contentManager.Load<Texture2D>("selectedpiece_glow");
+            //_moveForward = _contentManager.Load<Texture2D>("move_forward");
         }
 
         public override void Draw(Board board, List<CheckersPiece> playerOnePieces, List<CheckersPiece> playerTwoPieces, CheckersPiece selectedPiece = null)
@@ -44,22 +46,23 @@ namespace CS6613_Final
                 }
             }
 
-            for (int i = 0; i < playerOnePieces.Count; i++)
+            DrawPieces(_blackPiece, playerOnePieces, selectedPiece);
+            DrawPieces(_redPiece, playerTwoPieces, selectedPiece);
+        }
+
+        private void DrawPieces(Texture2D pieceTexture, List<CheckersPiece> pieces, CheckersPiece selectedPiece)
+        {
+            for (int i = 0; i < pieces.Count; i++)
             {
-                CheckersPiece piece = playerOnePieces[i];
-                Texture2D pieceTexture = _blackPiece;
+                CheckersPiece piece = pieces[i];
+                var rectToDrawIn = new Rectangle(piece.X*TileSize, piece.Y*TileSize, TileSize, TileSize);
 
-                _spriteBatch.Draw(pieceTexture, new Rectangle(piece.X * TileSize, piece.Y * TileSize, TileSize, TileSize),
-                                  Color.White);
-            }
+                if(piece.Equals(selectedPiece))
+                {
+                    _spriteBatch.Draw(_selectedGlow, new Vector2(rectToDrawIn.Center.X, rectToDrawIn.Center.Y), null, Color.White, 0f, new Vector2(48, 48), 1f, SpriteEffects.None,  0);
+                }
 
-            for (int i = 0; i < playerTwoPieces.Count; i++)
-            {
-                CheckersPiece piece = playerTwoPieces[i];
-                Texture2D pieceTexture = _redPiece;
-
-                _spriteBatch.Draw(pieceTexture, new Rectangle(piece.X * TileSize, piece.Y * TileSize, TileSize, TileSize),
-                                  Color.White);
+                _spriteBatch.Draw(pieceTexture, rectToDrawIn, Color.White);
             }
         }
     }
