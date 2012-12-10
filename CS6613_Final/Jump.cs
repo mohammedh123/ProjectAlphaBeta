@@ -22,8 +22,9 @@ namespace CS6613_Final
         {
             var clone = new Jump();
 
-            foreach(var jr in LocationsJumped)
+            for (int i = 0; i < LocationsJumped.Count; i++)
             {
+                var jr = LocationsJumped[i];
                 clone.LocationsJumped.Add(new JumpResult(jr.JumpedLocation, jr.FinalLocation));
             }
 

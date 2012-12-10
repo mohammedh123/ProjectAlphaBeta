@@ -31,7 +31,7 @@ namespace CS6613_Final
             _whiteTile = _contentManager.Load<Texture2D>("whitetile");
         }
 
-        public override void Draw(Board board, IEnumerable<CheckersPiece> pieces, CheckersPiece selectedPiece = null)
+        public override void Draw(Board board, List<CheckersPiece> playerOnePieces, List<CheckersPiece> playerTwoPieces, CheckersPiece selectedPiece = null)
         {
             for (int i = 0; i < board.Width; i++)
             {
@@ -44,12 +44,22 @@ namespace CS6613_Final
                 }
             }
 
-            foreach (CheckersPiece piece in pieces)
+            for (int i = 0; i < playerOnePieces.Count; i++)
             {
-                Texture2D pieceTexture = piece.Color == PieceColor.Black ? _blackPiece : _redPiece;
+                CheckersPiece piece = playerOnePieces[i];
+                Texture2D pieceTexture = _blackPiece;
 
-                _spriteBatch.Draw(pieceTexture, new Rectangle(piece.X*TileSize, piece.Y*TileSize, TileSize, TileSize),
-                                 Color.White);
+                _spriteBatch.Draw(pieceTexture, new Rectangle(piece.X * TileSize, piece.Y * TileSize, TileSize, TileSize),
+                                  Color.White);
+            }
+
+            for (int i = 0; i < playerTwoPieces.Count; i++)
+            {
+                CheckersPiece piece = playerTwoPieces[i];
+                Texture2D pieceTexture = _redPiece;
+
+                _spriteBatch.Draw(pieceTexture, new Rectangle(piece.X * TileSize, piece.Y * TileSize, TileSize, TileSize),
+                                  Color.White);
             }
         }
     }
