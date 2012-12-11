@@ -98,7 +98,7 @@ namespace CS6613_Final
 
                         _spriteBatch.Draw(_moveJump,
                                           new Vector2((initialLocation.X + 0.5f)*TileSize,
-                                                      (initialLocation.Y + 0.5f) * TileSize), null, Color.Lerp(Color.White, Color.Red, 1.0f/(j+1)),
+                                                      (initialLocation.Y + 0.5f) * TileSize), null, Color.White,
                                           angleToMove,
                                           origin, 1.0f, SpriteEffects.None, 0);
                     }
