@@ -36,6 +36,7 @@ namespace CS6613_Final
         private bool _isBlackTurn = true;
         private LogicDriver _playerOne, _playerTwo;
         public CheckersBoard Board { get; set; }
+        private List<MoveResult> _currentPossibleMoves = null;  
 
         public LogicDriver CurrentPlayer
         {
@@ -149,17 +150,20 @@ namespace CS6613_Final
 
         public void Draw()
         {
-            _displayer.Draw(Board.TileBoard, Board.Pieces.AlivePlayerOnePieces, Board.Pieces.AlivePlayerTwoPieces,
-                            SelectedPiece);
+            _displayer.Draw(Board.TileBoard, Board.Pieces.AlivePlayerOnePieces, Board.Pieces.AlivePlayerTwoPieces, _currentPossibleMoves, SelectedPiece);
         }
 
         public void AttemptTurn()
         {
+            if (_currentPossibleMoves == null)
+                _currentPossibleMoves = Board.GetAllAvailableMoves(CurrentPlayer.Color);
+
             var result = CurrentPlayer.GetNextMove(this);
 
             if (result == TurnResult.Finished)
             {
                 SwitchPlayer();
+                _currentPossibleMoves = null;
             }
         }
 

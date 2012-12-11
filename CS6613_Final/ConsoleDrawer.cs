@@ -5,7 +5,7 @@ namespace CS6613_Final
 {
     internal class ConsoleDrawer : DisplayDriver
     {
-        public override void Draw(Board board, List<CheckersPiece> playerOnePieces, List<CheckersPiece> playerTwoPieces, CheckersPiece selectedPiece = null)
+        public override void Draw(Board board, List<CheckersPiece> playerOnePieces, List<CheckersPiece> playerTwoPieces, List<MoveResult> availableMoves, CheckersPiece selectedPiece = null)
         {
             Console.Clear();
 

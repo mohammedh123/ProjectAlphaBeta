@@ -100,37 +100,7 @@ namespace CS6613_Final
                 {
                     if (_cgame.Board.IsGameOver(_cgame.CurrentPlayer.Color))
                     {
-                        //Draw(gameTime);
-                        CurrentGameState = GameState.GameOver;
-
-                        var winningPlayerState = _cgame.Board.GetGameResultState(_cgame.CurrentPlayer.Color);
-                        var winningPlayer = winningPlayerState == GameResult.BlackWins ? "One (Black)" : "Two (Red)";
-
-                        var dialogThread = new Thread(() =>
-                                                          {
-                                                              var dialogResult = WinForms.MessageBox.Show(
-                                                                  String.Format(
-                                                                      "Player {0} has won. Would you like to play again?",
-                                                                      winningPlayer),
-                                                                  "Game Over",
-                                                                  WinForms.MessageBoxButtons.YesNo,
-                                                                  WinForms.MessageBoxIcon.Question,
-                                                                  WinForms.MessageBoxDefaultButton.Button1);
-
-                                                              if (dialogResult == WinForms.DialogResult.Yes)
-                                                              {
-                                                                  RestartGame();
-                                                              }
-                                                              else if (dialogResult == WinForms.DialogResult.No)
-                                                              {
-                                                                  Exit();
-                                                              }
-                                                          });
-
-                        //a quick hack to make sure that the graphics thread draws the final state
-                        //this only matters when the ai is computing a move, because it is computing a move in a different thread and might miss a draw call after finding one
-                        dialogThread.Start();
-                        dialogThread.Join(1);
+                        HandleGameOver();
                     }
                     else
                     {
@@ -142,6 +112,40 @@ namespace CS6613_Final
             }
 
             base.Update(gameTime);
+        }
+
+        private void HandleGameOver()
+        {
+            CurrentGameState = GameState.GameOver;
+
+            var winningPlayerState = _cgame.Board.GetGameResultState(_cgame.CurrentPlayer.Color);
+            var winningPlayer = winningPlayerState == GameResult.BlackWins ? "One (Black)" : "Two (Red)";
+
+            var dialogThread = new Thread(() =>
+                                              {
+                                                  var dialogResult = WinForms.MessageBox.Show(
+                                                      String.Format(
+                                                          "Player {0} has won. Would you like to play again?",
+                                                          winningPlayer),
+                                                      "Game Over",
+                                                      WinForms.MessageBoxButtons.YesNo,
+                                                      WinForms.MessageBoxIcon.Question,
+                                                      WinForms.MessageBoxDefaultButton.Button1);
+
+                                                  if (dialogResult == WinForms.DialogResult.Yes)
+                                                  {
+                                                      RestartGame();
+                                                  }
+                                                  else if (dialogResult == WinForms.DialogResult.No)
+                                                  {
+                                                      Exit();
+                                                  }
+                                              });
+
+            //a quick hack to make sure that the graphics thread draws the final state
+            //this only matters when the ai is computing a move, because it is computing a move in a different thread and might miss a draw call after finding one
+            dialogThread.Start();
+            dialogThread.Join(1);
         }
 
         private void RestartGame()
