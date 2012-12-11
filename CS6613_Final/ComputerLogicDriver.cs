@@ -118,6 +118,8 @@ namespace CS6613_Final
             const int alpha = NegativeInfinity;
             const int beta = PositiveInfinity;
 
+            int totalNodesGenerated = 0, totalMaxPrunes = 0, totalMinPrunes = 0;
+
             AlphaBetaReturnValue lastCompletedMove = null;
             while (iterativeDepth <= (int)_difficultyLevel)
             {
@@ -134,8 +136,14 @@ namespace CS6613_Final
                     lastCompletedMove = v;
 
                     Console.WriteLine(
-                        "Iterative...Optimal move found with depth {0} and value {1}; max depth searched was {2}; time to find move: {3}; [{4}, {5}]",
-                        lastCompletedMove.Depth, lastCompletedMove.Value, maxDepth, DateTime.Now - AlphaBetaStartTime, alpha, beta);
+                        "\tSearch at depth {0} completed. Optimal move found with value {1}; time to find move: {2}.\n" +
+                        "\tNodes generated: {3}, max prunes: {4}, min prunes: {5}.\n",
+                        maxDepth, lastCompletedMove.Value, DateTime.Now - AlphaBetaStartTime,
+                        NodesGenerated, NumberOfMaxPrunes, NumberOfMinPrunes);
+
+                    totalNodesGenerated += NodesGenerated;
+                    totalMaxPrunes += NumberOfMaxPrunes;
+                    totalMinPrunes += NumberOfMinPrunes;
                 }
                 else break;
 
@@ -149,18 +157,16 @@ namespace CS6613_Final
             _lastSuccessfulDepth = iterativeDepth;
 
             Console.WriteLine(
-                "IDS ended. Optimal move found with depth {0} and value {1}; IDS stopped at depth {2}; time to find move: {3}; [{4}, {5}]",
-                lastCompletedMove.Depth, lastCompletedMove.Value, iterativeDepth, DateTime.Now - AlphaBetaStartTime, alpha, beta);
+                "IDS ended. Optimal move found with value {0}; IDS stopped at depth {1}; time to find move: {2}.\n" +
+                "Total completed IDS stats: \n\tNodes generated: {3}. \n\tMax prunes: {4}. \n\tMin prunes: {5}.\n",
+                lastCompletedMove.Value, iterativeDepth, DateTime.Now - AlphaBetaStartTime,
+                totalNodesGenerated, totalMaxPrunes, totalMinPrunes);
             return lastCompletedMove.Move;
         }
 
         public AlphaBetaReturnValue MaxValue(CheckersBoard board, int alphaValue, int betaValue, PieceColor color, ref int currentDepth, ref int maxDepth, int maxDepthToSearchFor)
         {
             NodesGenerated++;
-            if (NodesGenerated % 100000 == 0)
-                Console.WriteLine("NodesGenerated: {0}, Max Prunes: {1}, Min Prunes: {2}, Total Time: {3}, [{4}, {5}]",
-                                  NodesGenerated, NumberOfMaxPrunes, NumberOfMinPrunes,
-                                  DateTime.Now - AlphaBetaStartTime, alphaValue, betaValue);
 
             //var result = board.GetGameResultState(color);
 
@@ -235,10 +241,6 @@ namespace CS6613_Final
         public AlphaBetaReturnValue MinValue(CheckersBoard board, int alphaValue, int betaValue, PieceColor color, ref int currentDepth, ref int maxDepth, int maxDepthToSearchFor)
         {
             NodesGenerated++;
-            if (NodesGenerated % 100000 == 0)
-                Console.WriteLine("NodesGenerated: {0}, Max Prunes: {1}, Min Prunes: {2}, Total Time: {3}, [{4}, {5}]",
-                                  NodesGenerated, NumberOfMaxPrunes, NumberOfMinPrunes,
-                                  DateTime.Now - AlphaBetaStartTime, alphaValue, betaValue);
 
             //var result = board.GetGameResultState(color);
 

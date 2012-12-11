@@ -31,12 +31,6 @@ namespace CS6613_Final
             CurrentSelectedPiece = piece;
             _allAvailableMoves = game.Board.GetAllAvailableMoves(Color);
             _selectedAvailableMoves = game.Board.GetAvailableMovesForPiece(piece, false);
-
-            foreach (var move in _allAvailableMoves)
-                Console.WriteLine("Possible moves: {0} {1}", move.ToString(),
-                                  move.Type == MoveType.Jump
-                                      ? String.Format(" over {0}", String.Join(", ", move.JumpResults.Select(jr => jr.JumpedLocation)))
-                                      : "");
         }
 
         public override TurnResult GetNextMove(CheckersBoardGame game)
