@@ -1,11 +1,8 @@
-﻿namespace CS6613_Final
-{
-    public enum TileColor
-    {
-        Black,
-        White
-    }
+﻿// Mohammed Hossain 12/12/12
 
+namespace CS6613_Final
+{
+    // Board is an abstract representation of a gameDriver gameDriver's gameDriver. Self explanatory class.
     internal class Board
     {
         public Board(int width, int height)
@@ -15,11 +12,11 @@
 
             Tiles = new Tile[width,height];
 
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
+            for (var i = 0; i < width; i++)
+                for (var j = 0; j < height; j++)
                 {
-                    bool isTileBlack = (j + i)%2 != 0;
-                    Tiles[i, j] = new Tile(i, j, isTileBlack ? TileColor.Black : TileColor.White);
+                    var isTileBlack = (j + i)%2 != 0;
+                    Tiles[i, j] = new Tile(isTileBlack ? TileColor.Black : TileColor.White);
                 }
         }
 
@@ -46,6 +43,7 @@
             return GetNameForLocation(loc.X, loc.Y);
         }
 
+        // returns true if a given pair [x,y] is valid on the gameDriver
         public bool IsValidLocation(int x, int y)
         {
             return x >= 0 && x < Width && y >= 0 && y < Height;

@@ -1,10 +1,10 @@
-﻿using System;
+﻿// Mohammed Hossain 12/12/12
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace CS6613_Final
 {
+    //SetOfPieces: a collection of the lists of pieces in a checkers game (alive for each player, captured for each player); everything's pretty self-explanatory
     class SetOfPieces
     {
         public List<CheckersPiece> AlivePlayerOnePieces { get; set; }
@@ -95,10 +95,9 @@ namespace CS6613_Final
         {
             var listToCheck = col == PieceColor.Black ? CapturedPlayerOnePieces : CapturedPlayerTwoPieces;
 
-            CheckersPiece p;
-            for (int i = 0; i < listToCheck.Count; i++)
+            for (var i = 0; i < listToCheck.Count; i++)
             {
-                p = listToCheck[i];
+                var p = listToCheck[i];
 
                 if (p.Color == col && p.X == loc.X && p.Y == loc.Y)
                     return p;
@@ -112,7 +111,7 @@ namespace CS6613_Final
             var listToCheck = col == PieceColor.Black ? AlivePlayerOnePieces : AlivePlayerTwoPieces;
             var retList = new List<CheckersPiece>();
 
-            for (int i = 0; i < listToCheck.Count; i++)
+            for (var i = 0; i < listToCheck.Count; i++)
             {
                 var p = listToCheck[i];
                 retList.Add(p);
@@ -125,10 +124,9 @@ namespace CS6613_Final
         {
             var listToCheck = col == PieceColor.Black ? AlivePlayerOnePieces : AlivePlayerTwoPieces;
 
-            CheckersPiece p;
-            for (int i = 0; i < listToCheck.Count; i++)
+            for (var i = 0; i < listToCheck.Count; i++)
             {
-                p = listToCheck[i];
+                var p = listToCheck[i];
 
                 if (p.Color == col && p.X == loc.X && p.Y == loc.Y)
                     return p;
@@ -145,7 +143,7 @@ namespace CS6613_Final
             var listToKill = (killedPiece.Color == PieceColor.Black ? AlivePlayerOnePieces : AlivePlayerTwoPieces);
             var listToAdd = (killedPiece.Color == PieceColor.Black ? CapturedPlayerOnePieces : CapturedPlayerTwoPieces);
 
-            for (int i = 0; i < listToKill.Count; i++)
+            for (var i = 0; i < listToKill.Count; i++)
             {
                 var p = listToKill[i];
                 if (p.X == killedPiece.X && p.Y == killedPiece.Y)
@@ -166,7 +164,7 @@ namespace CS6613_Final
             var listToKill = (ressedPiece.Color == PieceColor.Black ? CapturedPlayerOnePieces : CapturedPlayerTwoPieces);
             var listToAdd = (ressedPiece.Color == PieceColor.Black ? AlivePlayerOnePieces : AlivePlayerTwoPieces);
 
-            for (int i = 0; i < listToKill.Count; i++)
+            for (var i = 0; i < listToKill.Count; i++)
             {
                 var p = listToKill[i];
                 if (p.X == ressedPiece.X && p.Y == ressedPiece.Y)

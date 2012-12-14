@@ -7,7 +7,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blackpiece.xnb</Output>
+      <Output>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blackpiece.xnb</Output>
       <Time>2012-11-12T20:39:49.2881112-05:00</Time>
     </Item>
     <Item>
@@ -16,7 +16,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blacktile.xnb</Output>
+      <Output>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\blacktile.xnb</Output>
       <Time>2012-11-12T20:39:49.2881112-05:00</Time>
     </Item>
     <Item>
@@ -25,7 +25,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\redpiece.xnb</Output>
+      <Output>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\redpiece.xnb</Output>
       <Time>2012-11-12T20:39:49.2891113-05:00</Time>
     </Item>
     <Item>
@@ -34,7 +34,7 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\whitetile.xnb</Output>
+      <Output>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\whitetile.xnb</Output>
       <Time>2012-11-12T20:39:49.2901113-05:00</Time>
     </Item>
     <Item>
@@ -43,8 +43,35 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\turnFont.xnb</Output>
+      <Output>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\turnFont.xnb</Output>
       <Time>2012-11-18T14:13:41.2857076-05:00</Time>
+    </Item>
+    <Item>
+      <Source>selectedpiece_glow.png</Source>
+      <Name>selectedpiece_glow</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\selectedpiece_glow.xnb</Output>
+      <Time>2012-12-10T21:21:00.5551984-05:00</Time>
+    </Item>
+    <Item>
+      <Source>move_forward.png</Source>
+      <Name>move_forward</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\move_forward.xnb</Output>
+      <Time>2012-12-10T21:21:00.5521982-05:00</Time>
+    </Item>
+    <Item>
+      <Source>move_jump.png</Source>
+      <Name>move_jump</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\move_jump.xnb</Output>
+      <Time>2012-12-10T21:21:00.5531983-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
@@ -52,10 +79,10 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_FinalContent\</RootDirectory>
-      <LoggerRootDirectory>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_FinalContent\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_FinalContent\</RootDirectory>
+      <LoggerRootDirectory>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\</LoggerRootDirectory>
+      <IntermediateDirectory>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_FinalContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>D:\Users\LiChE\Documents\Visual Studio 2010\Projects\ProjectAlphaBeta\CS6613_Final\CS6613_Final\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>
@@ -84,7 +111,7 @@
       </Assembly>
       <Assembly>
         <Key>C:\Windows\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
-        <Value>2012-01-25T23:53:36.3428515-05:00</Value>
+        <Value>2012-12-02T23:30:24.5433331-05:00</Value>
       </Assembly>
     </Assemblies>
   </Asset>

@@ -1,13 +1,12 @@
-﻿namespace CS6613_Final
+﻿// Mohammed Hossain 12/12/12
+
+namespace CS6613_Final
 {
+    //a very barren implementation of Tile: simply a color
     internal class Tile
     {
-        private Location _loc;
-
-        public Tile(int x, int y, TileColor color)
+        public Tile(TileColor color)
         {
-            _loc = new Location(x, y);
-
             Color = color;
         }
 

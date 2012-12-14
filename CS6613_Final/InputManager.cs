@@ -1,7 +1,10 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿// Mohammed Hossain 12/12/12
+
+using Microsoft.Xna.Framework.Input;
 
 namespace CS6613_Final
 {
+    //an InputManager that can be easily modifiable, to make the game agnostic of input (simply use the InputManager)
     public static class InputManager
     {
         private static MouseState _oldMouseState = Mouse.GetState();

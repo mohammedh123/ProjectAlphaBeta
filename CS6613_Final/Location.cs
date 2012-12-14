@@ -1,7 +1,10 @@
-﻿using System;
+﻿// Mohammed Hossain 12/12/12
+
+using System;
 
 namespace CS6613_Final
 {
+    //Location: a useful class that represents a point on the board (integer coordinates)
     public struct Location
     {
         public Location(int x, int y)

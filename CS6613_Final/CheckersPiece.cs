@@ -1,7 +1,10 @@
-﻿using System;
+﻿// Mohammed Hossain 12/12/12
+
+using System;
 
 namespace CS6613_Final
 {
+    // CheckersPiece: an abstraction of a piece in Checkers and the appropriate data
     public class CheckersPiece : IEquatable<CheckersPiece>
     {
         public CheckersPiece(int x, int y, PieceColor color, PieceDirection forward)

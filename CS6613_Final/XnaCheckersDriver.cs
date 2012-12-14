@@ -1,3 +1,5 @@
+// Mohammed Hossain 12/12/12
+
 using System;
 using System.Threading;
 using Microsoft.Xna.Framework;
@@ -7,6 +9,7 @@ using WinForms = System.Windows.Forms;
 
 namespace CS6613_Final
 {
+    //GameState: the possible states of the game
     public enum GameState
     {
         PlayerQuery,
@@ -16,22 +19,20 @@ namespace CS6613_Final
         GameOver
     }
 
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
-    public class CheckersGame : Game
+    //XnaCheckersDriver: the implemented functions of an XNA game that allow it to open a window, process input, etc
+    public class XnaCheckersDriver : Game
     {
+        public GameState CurrentGameState = GameState.WaitingForComputer;
         public const int TileSize = 64;
-        private const int SideSize = 200;
         public static Texture2D BlankTexture;
 
+        private const int SideSize = 200;
         private readonly GraphicsDeviceManager _graphics;
-        public GameState CurrentGameState = GameState.WaitingForComputer;
-        private CheckersBoardGame _cgame;
+        private CheckersGameDriver _cgame;
         private SpriteBatch _spriteBatch;
         private SpriteFont _turnFont;
 
-        public CheckersGame()
+        public XnaCheckersDriver()
         {
             _graphics = new GraphicsDeviceManager(this);
             IsMouseVisible = true;
@@ -39,16 +40,19 @@ namespace CS6613_Final
             Content.RootDirectory = "Content";
         }
 
+        //a quick way of grabbing the number of pixels a board takes up in width
         private int BoardWidthInPixels
         {
             get { return _cgame.Board.TileBoard.Width*TileSize; }
         }
 
+        //a quick way of grabbing the number of pixels a board takes up in width
         private int BoardHeightInPixels
         {
             get { return _cgame.Board.TileBoard.Height*TileSize; }
         }
-        
+
+        //a quick way of telling whether the given coordinates is within the Checkers board
         public bool IsWithinBoard(int x, int y)
         {
             var rect = new Rectangle(0, 0, BoardWidthInPixels, BoardHeightInPixels);
@@ -56,10 +60,7 @@ namespace CS6613_Final
             return rect.Contains(x, y);
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
+        //loads content/loads textures
         protected override void LoadContent()
         {
             _turnFont = Content.Load<SpriteFont>("turnFont");
@@ -74,25 +75,19 @@ namespace CS6613_Final
             _graphics.ApplyChanges();
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        //the main update function of the Xna driver; it consists of exiting the game if the user presses Escape, and also consists of polling the player for his turn.
+        //if the game is over, then it will handle that as well and call the appropriate function
+        //also updates the InputManager
         protected override void Update(GameTime gameTime)
         {
             if (IsActive)
             {
-                // Allows the game to exit
+                // Allows the gameDriver to exit
                 if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                     Exit();
 
@@ -121,6 +116,7 @@ namespace CS6613_Final
             var winningPlayerState = _cgame.Board.GetGameResultState(_cgame.CurrentPlayer.Color);
             var winningPlayer = winningPlayerState == GameResult.BlackWins ? "One (Black)" : "Two (Red)";
 
+            //if the game is over, then show a dialog and ask the user if he wants to play again, or exit the game
             var dialogThread = new Thread(() =>
                                               {
                                                   var dialogResult = WinForms.MessageBox.Show(
@@ -148,17 +144,19 @@ namespace CS6613_Final
             dialogThread.Join(1);
         }
 
+        //a function to take in the input and process it
         private void RestartGame()
         {
             Console.Clear();
             _cgame = null;
             LogicDriver pOne = null, pTwo = null;
-            bool playerWantsToGoFirst = false;
+            var playerWantsToGoFirst = false;
 
             var newForm = new SplashScreen();
             newForm.ShowDialog();
             var result = newForm.Result;
 
+            //depending on the TypeOfMatch, the new CheckersGame must have appropriate logic drivers
             if(result.TypeOfMatch == MatchType.PvP)
             {
                 pOne = new PlayerLogicDriver(this);
@@ -172,7 +170,7 @@ namespace CS6613_Final
                 pTwo = new ComputerLogicDriver(result.ComputerOneDifficulty);
 
                 CurrentGameState = GameState.WaitingForComputer;
-                var humanPlayerText = "Player One";
+                const string humanPlayerText = "Player One";
 
                 var goFirstResult =
                     WinForms.MessageBox.Show(String.Format("Would you ({0}) like to go first?", humanPlayerText),
@@ -191,17 +189,14 @@ namespace CS6613_Final
                 pTwo = new ComputerLogicDriver(result.ComputerTwoDifficulty);
             }
 
-            _cgame = new CheckersBoardGame();
+            _cgame = new CheckersGameDriver();
             _cgame.Start(6, pOne,
                         pTwo,
-                        new GuiDrawer(_spriteBatch, Content, this),
+                        new GuiDrawer(_spriteBatch, Content),
                         playerWantsToGoFirst);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        //all it will do is tells the CheckersGame to draw itself and draw whoever's turn it is on the right panel
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkGray);
@@ -213,7 +208,7 @@ namespace CS6613_Final
 
                 var finalStr = String.Format("{0}'s turn.", _cgame.CurrentPlayer.Color);
 
-                Utility.DrawStringToFitBox(_spriteBatch,
+                ExTextDrawer.DrawStringToFitBox(_spriteBatch,
                                            _turnFont,
                                            new Rectangle(BoardWidthInPixels, 0, SideSize, BoardHeightInPixels),
                                            finalStr,

@@ -1,9 +1,10 @@
-﻿using System;
+﻿// Mohammed Hossain 12/12/12
+
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CS6613_Final
 {
+    // a bunch of enums signifying Checkers game elements: the color of the piece, the direction that a piece goes forward, the type of move available for a piece, and the result of the game
     public enum PieceColor
     {
         Black,
@@ -30,14 +31,17 @@ namespace CS6613_Final
         StillGoing
     }
 
-    internal class CheckersBoardGame
+    // the driver of the game - controls the actual game flow of the Checkers game
+    internal class CheckersGameDriver
     {
+        public CheckersBoard Board { get; set; }
+
         private DisplayDriver _displayer;
         private bool _isBlackTurn = true;
         private LogicDriver _playerOne, _playerTwo;
-        public CheckersBoard Board { get; set; }
-        private List<MoveResult> _currentPossibleMoves = null;  
+        private List<MoveResult> _currentPossibleMoves;  
 
+        // returns the current player (determined by the bool variable _isBlackTurn)
         public LogicDriver CurrentPlayer
         {
             get
@@ -49,6 +53,7 @@ namespace CS6613_Final
             }
         }
 
+        // returns the currently selected piece, only if one of the players is a human player (meaningless in computer player senses)
         public CheckersPiece SelectedPiece
         {
             get
@@ -78,10 +83,10 @@ namespace CS6613_Final
             }
         }
 
+        // begins a new game of Checkers given the players and a displayer
         public void Start(int numPieces, LogicDriver pOne, LogicDriver pTwo, DisplayDriver displayer,
                           bool playerWantsToGoFirst)
         {
-            var r = new Random();
             Board = new CheckersBoard
                         {
                             TileBoard = new Board(6, 6),
@@ -112,9 +117,10 @@ namespace CS6613_Final
             _playerOne = pOne;
             _playerOne.Color = pOneColor == 0 ? PieceColor.Black : PieceColor.Red;
 
-            for (int j = 0; j < Board.TileBoard.Height; j++)
+            //set up the board and assign pieces on black tiles
+            for (var j = 0; j < Board.TileBoard.Height; j++)
             {
-                for (int i = 0; i < Board.TileBoard.Width; i++)
+                for (var i = 0; i < Board.TileBoard.Width; i++)
                 {
                     if (Board.TileBoard.GetTile(i, j).Color == TileColor.Black)
                         Board.Pieces.AddPiece(PieceColor.Black, i, j, PieceDirection.Down);
@@ -130,9 +136,10 @@ namespace CS6613_Final
             _playerTwo = pTwo;
             _playerTwo.Color = _playerOne.Color == PieceColor.Red ? PieceColor.Black : PieceColor.Red;
 
-            for (int j = Board.TileBoard.Height - 1; j >= 0; j--)
+            //set up the board and assign pieces on black tiles...again
+            for (var j = Board.TileBoard.Height - 1; j >= 0; j--)
             {
-                for (int i = 0; i < Board.TileBoard.Width; i++)
+                for (var i = 0; i < Board.TileBoard.Width; i++)
                 {
                     if (Board.TileBoard.GetTile(i, j).Color == TileColor.Black)
                         Board.Pieces.AddPiece(PieceColor.Red, i, j, PieceDirection.Up);
@@ -148,11 +155,13 @@ namespace CS6613_Final
             _displayer = displayer;
         }
 
+        // calls the displayer's Draw function
         public void Draw()
         {
             _displayer.Draw(Board.TileBoard, Board.Pieces.AlivePlayerOnePieces, Board.Pieces.AlivePlayerTwoPieces, _currentPossibleMoves, SelectedPiece);
         }
 
+        // tells the current player that its his turn; if the player reports that he is not done with his move, then it doesn't switch players until he is
         public void AttemptTurn()
         {
             if (_currentPossibleMoves == null)
@@ -167,6 +176,7 @@ namespace CS6613_Final
             }
         }
 
+        // switches the current player
         public void SwitchPlayer()
         {
             _isBlackTurn = !_isBlackTurn;

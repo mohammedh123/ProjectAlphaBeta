@@ -1,10 +1,11 @@
-﻿using System;
+﻿// Mohammed Hossain 12/12/12
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace CS6613_Final
 {
+    //MoveResult: an abstraction of all the information needed to perform a move in Checkers: the type of move, the jump result's (if its a jump), and the original/final piece location
     internal class MoveResult
     {
         public MoveType Type { get; set; }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Mohammed Hossain 12/12/12
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -14,16 +16,17 @@ namespace CS6613_Final
         Right = 0x04
     }
 
-    internal static class Utility
+    //a utility class with static methods to draw strings in specific situations
+    internal static class ExTextDrawer
     {
         public static void DrawStringToFitBox(SpriteBatch g, SpriteFont f, Rectangle box, string text,
                                               TextAlignment align, int padding, Color c, Color bg)
         {
             int lcharIndex = 0, rcharIndex = (text.IndexOf(" "));
-            string textToWrite = text.Substring(lcharIndex, rcharIndex);
+            var textToWrite = text.Substring(lcharIndex, rcharIndex);
             var position = new Vector2(box.X + padding, box.Y + padding);
 
-            Vector2 fontDimensions = f.MeasureString(textToWrite);
+            var fontDimensions = f.MeasureString(textToWrite);
             var newB = new Rectangle(box.Left, box.Top, box.Width, padding);
 
             //loop through strings' words until width is surpassed, once this happens, iterate backwards to last space found
@@ -32,9 +35,9 @@ namespace CS6613_Final
 
             while (rcharIndex != text.Count())
             {
-                int idxOfNewline = -1;
+                var idxOfNewline = -1;
 
-                int lastCharIndex = 0;
+                var lastCharIndex = 0;
                 while ((fontDimensions.X < box.Width - padding*2) && rcharIndex != text.Count())
                 {
                     lastCharIndex = rcharIndex;
@@ -75,11 +78,11 @@ namespace CS6613_Final
                 fontDimensions = Vector2.Zero;
             }
 
-            g.Draw(CheckersGame.BlankTexture, newB, bg);
+            g.Draw(XnaCheckersDriver.BlankTexture, newB, bg);
 
-            for (int i = 0; i < stringsToDraw.Count; i++)
+            for (var i = 0; i < stringsToDraw.Count; i++)
             {
-                string s = stringsToDraw[i];
+                var s = stringsToDraw[i];
                 fontDimensions = f.MeasureString(s);
                 position = new Vector2(box.X + padding, position.Y);
                 if ((align & TextAlignment.Center) == TextAlignment.Center)

@@ -1,11 +1,13 @@
-﻿using System;
+﻿// Mohammed Hossain 12/12/12
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
 namespace CS6613_Final
 {
+    // ComputerDifficulty: an abstraction of the computer's difficulty, the value of the enum is the max depth of the difficulty           
     public enum ComputerDifficulty
     {
         Easy = 2,
@@ -14,6 +16,7 @@ namespace CS6613_Final
         VeryHard = Int32.MaxValue
     }
 
+    // AlphaBetaReturnValue: a class containing the data useful for an alpha-beta search, such as a node's value, the move of that node, and the depth of the node
     class AlphaBetaReturnValue
     {
         public int Value { get; set; }
@@ -28,32 +31,36 @@ namespace CS6613_Final
         }
     }
 
+    // ComputerLogicDriver: an implementation of LogicDriver that implements the alpha-beta search
     internal class ComputerLogicDriver : LogicDriver
     {
-        private static readonly Dictionary<ComputerDifficulty, int> BaseDepthMap = new Dictionary<ComputerDifficulty, int>()
-                                                                               {
+        // an internal map of difficulties to base depths
+        private static readonly Dictionary<ComputerDifficulty, int> BaseDepthMap = new Dictionary<ComputerDifficulty, int>
+                                                                                {
                                                                                    {ComputerDifficulty.Easy, 1},
                                                                                    {ComputerDifficulty.Normal, 5},
                                                                                    {ComputerDifficulty.Hard, 10},
                                                                                    {ComputerDifficulty.VeryHard, 12}
-                                                                               };
+                                                                                };
         public const int NegativeInfinity = -500;
         public const int PositiveInfinity =  500;
 
+        // the thread that will be used for the alpha-beta search
         private Thread _logicThread;                                                                                       
 
+        // the start time of the alpha-beta search
         public DateTime AlphaBetaStartTime { get; set; }
 
+        // useful statistics for the alpha-beta search
         private int NodesGenerated { get; set; }
         private int NumberOfMaxPrunes { get; set; }
         private int NumberOfMinPrunes { get; set; }
 
         private readonly ComputerDifficulty _difficultyLevel;
         private TurnResult _finalResult = TurnResult.NotDone;
-        private int _numOfTurns = 0;
         private readonly int _baseDepth;
         private int _lastSuccessfulDepth = 1;
-        private bool _depthCutoffHit = false;
+        private bool _depthCutoffHit;
 
         public ComputerLogicDriver(ComputerDifficulty difficulty)
         {
@@ -68,6 +75,7 @@ namespace CS6613_Final
             _depthCutoffHit = false;
         }
 
+        //resets useful counts for the alpha-beta search
         public void ResetCounts()
         {
             NodesGenerated = 0;
@@ -78,10 +86,11 @@ namespace CS6613_Final
 
         //must be implemented by all logic driver's
         // return true if it is done finding its next move
-        public override TurnResult GetNextMove(CheckersBoardGame game)
+        public override TurnResult GetNextMove(CheckersGameDriver gameDriver)
         {
             if (_logicThread == null)
             {
+                //starts up a new thread if it isnt already running and tells it to run alpha-beta search
                 _finalResult = TurnResult.NotDone;
                 _logicThread = new Thread(() =>
                                               {
@@ -89,10 +98,10 @@ namespace CS6613_Final
                                                   AlphaBetaStartTime = DateTime.Now;
 
                                                   var maxDepth = 0;
-                                                  var move = AlphaBeta(game.Board, ref maxDepth);
+                                                  var move = AlphaBeta(gameDriver.Board, ref maxDepth);
                                                   if (move != null)
                                                   {
-                                                      var result = game.Board.MovePiece(move, Color);
+                                                      var result = gameDriver.Board.MovePiece(move, Color);
 
                                                       _finalResult = result;
                                                   }
@@ -101,25 +110,27 @@ namespace CS6613_Final
             }
             else
             {
+                //if there is indeed a thread running, if it is done, then we are done and return the finalResult
                 if(!_logicThread.IsAlive)
                 {
                     _logicThread.Join();
                     _logicThread = null;
-                    _numOfTurns++;
                 }
             }
 
             return _finalResult;
         }
 
+        //a straightforward implementation of the alpha-beta search, using iterative deepening search
         public MoveResult AlphaBeta(CheckersBoard game, ref int maxDepth)
         {
-            int iterativeDepth = _lastSuccessfulDepth;
+            var iterativeDepth = _lastSuccessfulDepth;
             const int alpha = NegativeInfinity;
             const int beta = PositiveInfinity;
 
             int totalNodesGenerated = 0, totalMaxPrunes = 0, totalMinPrunes = 0;
 
+            //limits itself to the difficulty level's max depth
             AlphaBetaReturnValue lastCompletedMove = null;
             while (iterativeDepth <= (int)_difficultyLevel)
             {
@@ -141,12 +152,13 @@ namespace CS6613_Final
                         maxDepth, lastCompletedMove.Value, DateTime.Now - AlphaBetaStartTime,
                         NodesGenerated, NumberOfMaxPrunes, NumberOfMinPrunes);
 
+                    //keeps a running total of the total stats for the IDS
                     totalNodesGenerated += NodesGenerated;
                     totalMaxPrunes += NumberOfMaxPrunes;
                     totalMinPrunes += NumberOfMinPrunes;
                 }
                 else break;
-
+                
                 if (maxDepth == 0 || !_depthCutoffHit || iterativeDepth == (int)_difficultyLevel)
                     break;
 
@@ -164,18 +176,15 @@ namespace CS6613_Final
             return lastCompletedMove.Move;
         }
 
+        //straightforward implementation's of Max- and Min-Value, the only interesting thing being that i revert moves after running max/min on the resulting board
         public AlphaBetaReturnValue MaxValue(CheckersBoard board, int alphaValue, int betaValue, PieceColor color, ref int currentDepth, ref int maxDepth, int maxDepthToSearchFor)
         {
             NodesGenerated++;
-
-            //var result = board.GetGameResultState(color);
-
+            
             var v = new AlphaBetaReturnValue(NegativeInfinity, null, currentDepth + 1);
-
             var moves = board.GetAllAvailableMoves(color).ToList().OrderByDescending(mr => mr.JumpResults.Count()).ToList();
-            //var numJumps = moves.Count(mr => mr.Type == MoveType.Jump) >= 2;
-
             var coTest = CutoffTest(board, currentDepth, maxDepthToSearchFor);
+
             if (coTest.HasValue && coTest.Value || !moves.Any())
             {
                 v.Value = Evaluate(board, color);
@@ -183,12 +192,12 @@ namespace CS6613_Final
 
                 return v;
             }
-            else if (!coTest.HasValue)
+            if (!coTest.HasValue)
             {
                 return null;
             }
 
-            for (int i = 0; i < moves.Count; i++)
+            for (var i = 0; i < moves.Count; i++)
             {
                 var m = moves[i];
                 board.MovePiece(m, color);
@@ -228,7 +237,6 @@ namespace CS6613_Final
 
                 if (v.Value >= betaValue)
                 {
-                    //Console.WriteLine("Max pruned.");
                     NumberOfMaxPrunes++;
                     return v;
                 }
@@ -242,13 +250,10 @@ namespace CS6613_Final
         {
             NodesGenerated++;
 
-            //var result = board.GetGameResultState(color);
-
             var v = new AlphaBetaReturnValue(PositiveInfinity, null, currentDepth + 1);
             var moves = board.GetAllAvailableMoves(color).ToList().OrderByDescending(mr => mr.JumpResults.Count()).ToList();
-            //var numJumps = moves.Count(mr => mr.Type == MoveType.Jump) >= 2;
-
             var coTest = CutoffTest(board, currentDepth, maxDepthToSearchFor);
+
             if (coTest.HasValue && coTest.Value || !moves.Any())
             {
                 v.Value = Evaluate(board, color);
@@ -256,12 +261,12 @@ namespace CS6613_Final
 
                 return v;
             }
-            else if (!coTest.HasValue)
+            if (!coTest.HasValue)
             {
                 return null;
             }
 
-            for (int i = 0; i < moves.Count; i++)
+            for (var i = 0; i < moves.Count; i++)
             {
                 var m = moves[i];
                 board.MovePiece(m, color);
@@ -300,7 +305,6 @@ namespace CS6613_Final
 
                 if (v.Value <= alphaValue)
                 {
-                    //Console.WriteLine("Min pruned.");
                     NumberOfMinPrunes++;
                     return retVal;
                 }
@@ -311,40 +315,27 @@ namespace CS6613_Final
             return v;
         }
 
+        // the evaluation function sums up the values of the pieces for each color and the available moves
+        // the available moves is weighted more, and the value of the piece is determined by how close the piece is to the center of the board [favors pieces that are in the center]
         public int Evaluate(CheckersBoard state, PieceColor color)
         {
             int pOne = 0, pTwo = 0;
 
-            
-            //var pOnePieces = state.PlayerOnePieces.Where(cp => cp.InPlay);
-            //var pTwoPieces = state.PlayerTwoPieces.Where(cp => cp.InPlay);
-            
-            //var pOneRow = 1;
-            //var pTwoRow = state.TileBoard.Height - 2 - pOneRow;
-
-            for (int i = 0; i < state.Pieces.AlivePlayerOnePieces.Count; i++)
+            for (var i = 0; i < state.Pieces.AlivePlayerOnePieces.Count; i++)
             {
                 var piece = state.Pieces.AlivePlayerOnePieces[i];
                 pOne += 3*(state.TileBoard.Height >> 1 - Math.Abs(state.TileBoard.Height >> 1 - piece.Y)) +
                         3*(state.TileBoard.Width >> 1 - Math.Abs(state.TileBoard.Width >> 1 - piece.X));
             }
-            for (int i = 0; i < state.Pieces.AlivePlayerTwoPieces.Count; i++)
+            for (var i = 0; i < state.Pieces.AlivePlayerTwoPieces.Count; i++)
             {
                 var piece = state.Pieces.AlivePlayerTwoPieces[i];
                 pTwo += 3*(state.TileBoard.Height >> 1 - Math.Abs(state.TileBoard.Height >> 1 - piece.Y)) +
                         3*(state.TileBoard.Width >> 1 - Math.Abs(state.TileBoard.Width >> 1 - piece.X));
             }
 
-            //pOne = state.PlayerOnePieces.Count();
-            //pTwo = state.PlayerTwoPieces.Count();
-
-            //pOne += state.Pieces.AlivePlayerOnePieces.Sum(piece => 5);
-            //pTwo += state.Pieces.AlivePlayerTwoPieces.Sum(piece => 5);
             pOne += state.GetAllAvailableMoves(PieceColor.Black).Count()*10;
             pTwo += state.GetAllAvailableMoves(PieceColor.Red).Count()*10;
-
-            //pOne += state.PlayerOnePieces.Count(p => p.InPlay) * 5;
-            //pTwo += state.PlayerTwoPieces.Count(p => p.InPlay) * 5;
 
             return (Color == PieceColor.Black ? pOne - pTwo : pTwo - pOne);
         }

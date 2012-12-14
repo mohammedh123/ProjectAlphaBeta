@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Mohammed Hossain 12/12/12
+
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -6,20 +8,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace CS6613_Final
 {
+    // an implementation of DisplayDriver that outputs to a GUI; there's not much to explain here, self explanatory
     internal class GuiDrawer : DisplayDriver
     {
-        private const int TileSize = CheckersGame.TileSize;
-        private readonly CheckersGame _checkersGame;
+        private const int TileSize = XnaCheckersDriver.TileSize;
         private readonly ContentManager _contentManager;
         private readonly SpriteBatch _spriteBatch;
-        private readonly Vector2 _tileCenter = new Vector2(TileSize*0.5f, TileSize*0.5f);
         private Texture2D _blackPiece, _blackTile, _redPiece, _whiteTile, _selectedGlow, _moveForward, _moveJump;
 
-        public GuiDrawer(SpriteBatch sb, ContentManager content, CheckersGame game)
+        public GuiDrawer(SpriteBatch sb, ContentManager content)
         {
             _spriteBatch = sb;
             _contentManager = content;
-            _checkersGame = game;
 
             LoadImages();
         }
@@ -37,11 +37,11 @@ namespace CS6613_Final
 
         public override void Draw(Board board, List<CheckersPiece> playerOnePieces, List<CheckersPiece> playerTwoPieces, List<MoveResult> availableMoves, CheckersPiece selectedPiece = null)
         {
-            for (int i = 0; i < board.Width; i++)
+            for (var i = 0; i < board.Width; i++)
             {
-                for (int j = 0; j < board.Height; j++)
+                for (var j = 0; j < board.Height; j++)
                 {
-                    Texture2D tileTexture = board.GetTile(i, j).Color == TileColor.Black ? _blackTile : _whiteTile;
+                    var tileTexture = board.GetTile(i, j).Color == TileColor.Black ? _blackTile : _whiteTile;
 
                     _spriteBatch.Draw(tileTexture, new Rectangle(i*TileSize, j*TileSize, TileSize, TileSize),
                                      Color.White);
@@ -58,7 +58,7 @@ namespace CS6613_Final
             if (availableMoves == null)
                 return;
 
-            for (int i = 0; i < availableMoves.Count; i++)
+            for (var i = 0; i < availableMoves.Count; i++)
             {
                 var move = availableMoves[i];
                 if (move.Type == MoveType.Forward)
@@ -76,11 +76,10 @@ namespace CS6613_Final
                 else if (move.Type == MoveType.Jump)
                 {
                     var origin = new Vector2(39, 128);
-                    for (int j = 0; j < move.JumpResults.Count; j++)
+                    for (var j = 0; j < move.JumpResults.Count; j++)
                     {
                         var jump = move.JumpResults[j];
                         Vector2 initialLocation;
-                        var angleToMove = 0.0f;
 
                         if (j == 0)
                         {
@@ -92,9 +91,8 @@ namespace CS6613_Final
                                                           move.JumpResults[j - 1].FinalLocation.Y);
                         }
 
-                        angleToMove =
-                            (float)Math.Atan2(jump.FinalLocation.Y - initialLocation.Y,
-                                               jump.FinalLocation.X - initialLocation.X);
+                        var angleToMove = (float)Math.Atan2(jump.FinalLocation.Y - initialLocation.Y,
+                                                              jump.FinalLocation.X - initialLocation.X);
 
                         _spriteBatch.Draw(_moveJump,
                                           new Vector2((initialLocation.X + 0.5f)*TileSize,
@@ -108,9 +106,9 @@ namespace CS6613_Final
 
         private void DrawPieces(Texture2D pieceTexture, List<CheckersPiece> pieces, CheckersPiece selectedPiece)
         {
-            for (int i = 0; i < pieces.Count; i++)
+            for (var i = 0; i < pieces.Count; i++)
             {
-                CheckersPiece piece = pieces[i];
+                var piece = pieces[i];
                 var rectToDrawIn = new Rectangle(piece.X*TileSize, piece.Y*TileSize, TileSize, TileSize);
 
                 if(piece.Equals(selectedPiece))

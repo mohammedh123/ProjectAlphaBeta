@@ -1,7 +1,10 @@
+// Mohammed Hossain 12/12/12
+
 using System;
 
 namespace CS6613_Final
 {
+    //a value-type to represent a SINGLE jump (not multiple); contains the jumped location and the final location of the jump
     public struct JumpResult
     {
         public Location JumpedLocation;
