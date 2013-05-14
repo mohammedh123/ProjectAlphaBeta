@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace CS6613_Final
 {
@@ -213,7 +214,8 @@ namespace CS6613_Final
             }
 
             // if there are any jumps, you must take a jump
-           availables.RemoveAll(m => m.Type != MoveType.Jump);
+            if(availables.Any(m => m.Type == MoveType.Jump))
+               availables.RemoveAll(m => m.Type != MoveType.Jump);
 
             return availables;
         }

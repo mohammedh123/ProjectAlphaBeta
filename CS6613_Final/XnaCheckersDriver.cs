@@ -26,6 +26,7 @@ namespace CS6613_Final
         public const int TileSize = 64;
         public static Texture2D BlankTexture;
 
+        private WinForms.DialogResult? _dialogResult = null;
         private const int SideSize = 200;
         private readonly GraphicsDeviceManager _graphics;
         private CheckersGameDriver _cgame;
@@ -119,21 +120,27 @@ namespace CS6613_Final
             //if the game is over, then show a dialog and ask the user if he wants to play again, or exit the game
             var dialogThread = new Thread(() =>
                                               {
-                                                  var dialogResult = WinForms.MessageBox.Show(
-                                                      String.Format(
-                                                          "Player {0} has won. Would you like to play again?",
-                                                          winningPlayer),
-                                                      "Game Over",
-                                                      WinForms.MessageBoxButtons.YesNo,
-                                                      WinForms.MessageBoxIcon.Question,
-                                                      WinForms.MessageBoxDefaultButton.Button1);
-
-                                                  if (dialogResult == WinForms.DialogResult.Yes)
+                                                  if (_dialogResult == null)
                                                   {
+                                                      _dialogResult = WinForms.DialogResult.None;
+                                                      _dialogResult = WinForms.MessageBox.Show(
+                                                          String.Format(
+                                                              "Player {0} has won. Would you like to play again?",
+                                                              winningPlayer),
+                                                          "Game Over",
+                                                          WinForms.MessageBoxButtons.YesNo,
+                                                          WinForms.MessageBoxIcon.Question,
+                                                          WinForms.MessageBoxDefaultButton.Button1);
+                                                  }
+
+                                                  if (_dialogResult == WinForms.DialogResult.Yes)
+                                                  {
+                                                      _dialogResult = null;
                                                       RestartGame();
                                                   }
-                                                  else if (dialogResult == WinForms.DialogResult.No)
+                                                  else if (_dialogResult == WinForms.DialogResult.No)
                                                   {
+                                                      _dialogResult = null;
                                                       Exit();
                                                   }
                                               });
